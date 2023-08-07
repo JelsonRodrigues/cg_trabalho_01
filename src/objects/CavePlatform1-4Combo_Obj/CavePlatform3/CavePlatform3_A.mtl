@@ -1,0 +1,11 @@
+# Created with Anim8or 1.00
+# Object "CavePlatform3_A":
+
+newmtl CavePlatform3
+Ka 0.157 0.157 0.157
+Kd 0.439 0.439 0.439
+Ks 0.173 0.173 0.173
+Ns 752.6
+map_Kd CavePlatform3_Base_Diffuse.png
+map_Ks CavePlatform3_Base_Specular.png
+
