@@ -38,11 +38,172 @@ export class gl {
     this.buffer_triangle_vertices = this.gl.createBuffer() as WebGLBuffer;
 
     this.gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, this.buffer_triangle_vertices);
-    this.gl.bufferData(WebGL2RenderingContext.ARRAY_BUFFER, new Float32Array([
-      -1.0, -0.0, 0.6,
-      0.0, 0.6, 0.4,
-      1.0, 0.0, 0.6,
-      ]), 
+    // const data = [
+    //   -1.00, 0, 0.60,
+    //   0, 0.60, 0.40,
+    //   1.00, 0, 0.60,
+    //   -1.00, 0, 0.0,
+    //   0, 0.60, 0.0,
+    //   1.00, 0, 0.0,
+    // ];
+    // const data = [
+    // // left column
+    // 0, 0, 0,
+    // 30, 0, 0,
+    // 0, 150, 0,
+    // 0, 150, 0,
+    // 30, 0, 0,
+    // 30, 150, 0,
+
+    // // top rung
+    // 30, 0, 0,
+    // 100, 0, 0,
+    // 30, 30, 0,
+    // 30, 30, 0,
+    // 100, 0, 0,
+    // 100, 30, 0,
+
+    // // middle rung
+    // 30, 60, 0,
+    // 67, 60, 0,
+    // 30, 90, 0,
+    // 30, 90, 0,
+    // 67, 60, 0,
+    // 67, 90, 0];
+
+    const data = [
+      // left column front
+      0,   0,  0,
+      30,   0,  0,
+       0, 150,  0,
+       0, 150,  0,
+      30,   0,  0,
+      30, 150,  0,
+
+     // top rung front
+      30,   0,  0,
+     100,   0,  0,
+      30,  30,  0,
+      30,  30,  0,
+     100,   0,  0,
+     100,  30,  0,
+
+     // middle rung front
+      30,  60,  0,
+      67,  60,  0,
+      30,  90,  0,
+      30,  90,  0,
+      67,  60,  0,
+      67,  90,  0,
+
+     // left column back
+       0,   0,  30,
+      30,   0,  30,
+       0, 150,  30,
+       0, 150,  30,
+      30,   0,  30,
+      30, 150,  30,
+
+     // top rung back
+      30,   0,  30,
+     100,   0,  30,
+      30,  30,  30,
+      30,  30,  30,
+     100,   0,  30,
+     100,  30,  30,
+
+     // middle rung back
+      30,  60,  30,
+      67,  60,  30,
+      30,  90,  30,
+      30,  90,  30,
+      67,  60,  30,
+      67,  90,  30,
+
+     // top
+       0,   0,   0,
+     100,   0,   0,
+     100,   0,  30,
+       0,   0,   0,
+     100,   0,  30,
+       0,   0,  30,
+
+     // top rung right
+     100,   0,   0,
+     100,  30,   0,
+     100,  30,  30,
+     100,   0,   0,
+     100,  30,  30,
+     100,   0,  30,
+
+     // under top rung
+     30,   30,   0,
+     30,   30,  30,
+     100,  30,  30,
+     30,   30,   0,
+     100,  30,  30,
+     100,  30,   0,
+
+     // between top rung and middle
+     30,   30,   0,
+     30,   30,  30,
+     30,   60,  30,
+     30,   30,   0,
+     30,   60,  30,
+     30,   60,   0,
+
+     // top of middle rung
+     30,   60,   0,
+     30,   60,  30,
+     67,   60,  30,
+     30,   60,   0,
+     67,   60,  30,
+     67,   60,   0,
+
+     // right of middle rung
+     67,   60,   0,
+     67,   60,  30,
+     67,   90,  30,
+     67,   60,   0,
+     67,   90,  30,
+     67,   90,   0,
+
+     // bottom of middle rung.
+     30,   90,   0,
+     30,   90,  30,
+     67,   90,  30,
+     30,   90,   0,
+     67,   90,  30,
+     67,   90,   0,
+
+     // right of bottom
+     30,   90,   0,
+     30,   90,  30,
+     30,  150,  30,
+     30,   90,   0,
+     30,  150,  30,
+     30,  150,   0,
+
+     // bottom
+     0,   150,   0,
+     0,   150,  30,
+     30,  150,  30,
+     0,   150,   0,
+     30,  150,  30,
+     30,  150,   0,
+
+     // left side
+     0,   0,   0,
+     0,   0,  30,
+     0, 150,  30,
+     0,   0,   0,
+     0, 150,  30,
+     0, 150,   0,
+    ];
+
+    this.gl.bufferData(
+      WebGL2RenderingContext.ARRAY_BUFFER, 
+      new Float32Array(data), 
       WebGL2RenderingContext.STATIC_DRAW
     );
   }
@@ -58,8 +219,8 @@ export class gl {
     this.gl.uniformMatrix4fv(this.u_view, false, view);
     this.gl.uniformMatrix4fv(this.u_projection, false, projection);
 
-    this.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
-    this.gl.drawArrays(WebGL2RenderingContext.TRIANGLES, 0, 3);
+    this.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT | WebGL2RenderingContext.DEPTH_BUFFER_BIT);
+    this.gl.drawArrays(WebGL2RenderingContext.TRIANGLES, 0, 16*6);
   }
 
   static createShader(gl: WebGL2RenderingContext, type : number, source:string) : WebGLShader | null{
@@ -108,24 +269,23 @@ export module WebGLUtils {
   }
   
   /** @todo Read file in small chunks, preferable using something like 64 or 256 lines at time */
-  export async function readObj(filePath:string) : Promise<[Array<number>, Array<number>, Array<number>, Array<number>]> {
+  export async function readObj(filePath:string) : Promise<[Array<number>, Array<number>, Array<number>, Array<number>, Array<number>, Array<number>]> {
     const obj_content = await readFile(filePath);
-    const vertexArray = new Array();
-    const colorArray = new Array();
-    const vertexTextCoordArray = new Array();
-    const facesIndex = new Array();
-    obj_content.split("\n").map((line) => {
-      let elements = line.split(" ");
+
+    const vertexArray = [0.0, 0.0, 0.0];
+    const vertexTextCoordArray = [0.0, 0.0];
+    const vertexNormalArray = [0.0, 0.0, 0.0];
+
+    const vertexIndexArray = new Array();
+    const vertexIndexTextCoordArray = new Array();
+    const vertexIndexNormalArray = new Array();
+
+    obj_content.split(/\n/).map((line) => {
+      let elements = line.trim().split(/\s+/);
       if (elements[0] == 'v') {
         for (let index = 1; index < elements.length; ++index) {
           const number = parseFloat(elements[index]);
           vertexArray.push(number);
-        }
-      }
-      else if (elements[0] == 'c') {
-        for (let index = 1; index < elements.length; ++index) {
-          const number = parseFloat(elements[index]);
-          colorArray.push(number);
         }
       }
       else if (elements[0] == 'vt'){
@@ -134,18 +294,31 @@ export module WebGLUtils {
           vertexTextCoordArray.push(number);
         }
       }
+      else if (elements[0] == 'vn') {
+        for (let index = 1; index < elements.length; ++index) {
+          const number = parseFloat(elements[index]);
+          vertexNormalArray.push(number);
+        }
+      }
+      // Handle when square is used
       else if (elements[0] == 'f') {
         for (let index = 1; index < elements.length; ++index) {
-          const values = elements[index].split('/');
-          for (let number = 0; number < values.length; ++number) {
-            const number = parseInt(elements[index]);
-            facesIndex.push(number);
+          const values = elements[index].trim().split(/\//);
+          if (values.length >= 1) {
+            vertexIndexArray.push(parseInt(values[0]));
+          }
+          if (values.length >= 2) {
+            vertexIndexTextCoordArray.push(parseInt(values[1]));
+          }
+          if (values.length >= 3) {
+            vertexIndexNormalArray.push(parseInt(values[2]));
           }
         }
       }
     });
   
-    return [vertexArray, colorArray, vertexTextCoordArray, facesIndex];
+    return [vertexArray, vertexTextCoordArray, vertexNormalArray, 
+            vertexIndexArray, vertexIndexTextCoordArray, vertexIndexNormalArray];
   }
   }
   

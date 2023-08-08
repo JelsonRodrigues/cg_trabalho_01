@@ -19,5 +19,5 @@ uniform mat4x4 view;
 uniform mat4x4 model;
 
 void main() {
-  gl_Position = vec4((projection * view * model * position).xy, 0, 1);
+  gl_Position = projection * view * model * position;
 }
