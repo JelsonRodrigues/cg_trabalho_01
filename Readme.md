@@ -2,13 +2,13 @@
 
 # Todo!
 - [x] Create folders skeleton
-- [ ] Create matrix handling functions
-- [ ] Create vector handling functions
+- [x] Create matrix handling functions
+- [x] Create vector handling functions
 - [ ] Create spline functions
 - [ ] Create html skeleton
-    - [ ] Create canvas
+    - [x] Create canvas
     - [ ] Create button to animate
-- [ ] Create the projection matrix
+- [x] Create the projection matrix
 - [ ] Read a WebGL Texture (How?)
 - [ ] Create the world
     - [ ] Define what scene will look like
