@@ -6,10 +6,12 @@ import { Spline } from "../modules/Spline";
 import vertexShader from "../shaders/vertexShader.glsl";
 import fragmentShader from "../shaders/fragmentShader.glsl";
 import { CubicBezierCurve } from "../modules/CubicBezierCurve";
+import { DrawableObject } from "./DrawableObject";
+import { F } from "./F";
 
 var gl_handler : gl; 
 var spline : Spline;
-
+var objects : Array<DrawableObject> = new Array();
 
 async function main() {
   // Try read a OBJ
@@ -47,9 +49,6 @@ async function main() {
   const fsSource = fragmentShader;
   gl_handler = new gl(canva, vsSource, fsSource);  
   
-  const buffer_pyramid = gl_handler.gl.createBuffer();
-  gl_handler.gl.bindBuffer(WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER, buffer_pyramid);
-
   const spline_points = new Array();
   spline.array_points.forEach((vec) => {
     spline_points.push(vec[0]);
@@ -67,6 +66,10 @@ async function main() {
   gl_handler.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
 
   gl_handler.gl.viewport(0, 0, canva.width, canva.height);
+
+  objects.push(
+    new F(gl_handler.gl),
+  );
 
   start = Date.now();
   animateTiangle();
@@ -109,6 +112,7 @@ function animateTiangle() {
   const model = glm.mat4.create();
   glm.mat4.identity(model);
   glm.mat4.scale(model, model, [1.0/30.0, -1.0/30.0, 1.0/30.0]);
+  objects[0].model = model;
   // glm.mat4.translate(model, model, [Math.sin(angle/2) * 300, 0.0, 0.0]);
 
   // Create view matrix
@@ -138,7 +142,19 @@ function animateTiangle() {
   // Por algum motivo a inversa nao e igual a transposta, deveria. Mas pode ser que os vetores que 
   // eu estou inserindo nao sao normalizados e/ou ortogonais??
 
-  gl_handler.drawTriangle(model, camera, perspective);
+  // gl_handler.drawTriangle(model, camera, perspective);
+  gl_handler.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
+
+  objects.forEach((drawable_obj) => {
+    if (drawable_obj.draw !== undefined) {
+      drawable_obj.draw(gl_handler.gl, camera, perspective);
+    }
+    else {
+      console.log("DRAW E UNDEFINED");
+      return;
+      
+    }
+  });
   
   /* Draw the Control points */
   glm.mat4.identity(model);

@@ -41,8 +41,10 @@ const Spline_1 = require("../modules/Spline");
 const vertexShader_glsl_1 = __importDefault(require("../shaders/vertexShader.glsl"));
 const fragmentShader_glsl_1 = __importDefault(require("../shaders/fragmentShader.glsl"));
 const CubicBezierCurve_1 = require("../modules/CubicBezierCurve");
+const F_1 = require("./F");
 var gl_handler;
 var spline;
+var objects = new Array();
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         // Try read a OBJ
@@ -61,8 +63,6 @@ function main() {
         const vsSource = vertexShader_glsl_1.default;
         const fsSource = fragmentShader_glsl_1.default;
         gl_handler = new gl_1.gl(canva, vsSource, fsSource);
-        const buffer_pyramid = gl_handler.gl.createBuffer();
-        gl_handler.gl.bindBuffer(WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER, buffer_pyramid);
         const spline_points = new Array();
         spline.array_points.forEach((vec) => {
             spline_points.push(vec[0]);
@@ -73,6 +73,7 @@ function main() {
         gl_handler.gl.bufferData(WebGL2RenderingContext.ARRAY_BUFFER, new Float32Array(spline_points), WebGL2RenderingContext.STATIC_DRAW);
         gl_handler.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
         gl_handler.gl.viewport(0, 0, canva.width, canva.height);
+        objects.push(new F_1.F(gl_handler.gl));
         start = Date.now();
         animateTiangle();
     });
@@ -106,6 +107,7 @@ function animateTiangle() {
     const model = glm.mat4.create();
     glm.mat4.identity(model);
     glm.mat4.scale(model, model, [1.0 / 30.0, -1.0 / 30.0, 1.0 / 30.0]);
+    objects[0].model = model;
     // glm.mat4.translate(model, model, [Math.sin(angle/2) * 300, 0.0, 0.0]);
     // Create view matrix
     const radius = 10.0;
@@ -129,7 +131,17 @@ function animateTiangle() {
     // a posicao do olho, up vector ... e depois a mudanca de base usa-se a lookAt
     // Por algum motivo a inversa nao e igual a transposta, deveria. Mas pode ser que os vetores que 
     // eu estou inserindo nao sao normalizados e/ou ortogonais??
-    gl_handler.drawTriangle(model, camera, perspective);
+    // gl_handler.drawTriangle(model, camera, perspective);
+    gl_handler.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
+    objects.forEach((drawable_obj) => {
+        if (drawable_obj.draw !== undefined) {
+            drawable_obj.draw(gl_handler.gl, camera, perspective);
+        }
+        else {
+            console.log("DRAW E UNDEFINED");
+            return;
+        }
+    });
     /* Draw the Control points */
     glm.mat4.identity(model);
     gl_handler.drawControlPoints(spline.array_points.length, model, camera, perspective);
