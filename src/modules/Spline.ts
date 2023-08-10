@@ -1,24 +1,22 @@
-import {Vec} from "./Vec.js"
+import * as glm from "gl-matrix"
 import {CubicBezierCurve} from "./CubicBezierCurve.js"
 
 export class Spline {
   private curves : Array<CubicBezierCurve>;
   private num_points_per_curve : number;
-  public array_points : Array<Vec>;
-  public array_colors : Array<Vec>;
-  
-  constructor (numPoints : number = 150) {
+  public array_points : Array<glm.vec4>;
+
+  constructor (numPoints : number = 128) {
     this.num_points_per_curve = numPoints;
     this.curves = new Array();
     this.array_points = new Array(numPoints);
-    this.array_colors = new Array(numPoints);
   }
 
   public addCurve(curve : CubicBezierCurve) {
     this.curves.push(curve);
   }
 
-  public getPoint(t:number) : Vec {
+  public getPoint(t:number) : glm.vec4 {
     const sanitized_t = Math.abs(t) % 1.0;
     const expand_t = sanitized_t * this.curves.length;
     const curve_index = Math.floor(expand_t);
@@ -27,16 +25,7 @@ export class Spline {
     return this.curves[curve_index].getPoint(new_t);
   }
 
-  public getColorInPoint(t:number) : Vec {
-    const sanitized_t = Math.abs(t) % 1.0;
-    const expand_t = sanitized_t * this.curves.length;
-    const curve_index = Math.floor(expand_t);
-    const new_t = expand_t - curve_index;
-    
-    return this.curves[curve_index].getColorInPoint(new_t);
-  }
-
-  public getPointTangent(t:number) : Vec {
+  public getPointTangent(t:number) : glm.vec4 {
     const sanitized_t = Math.abs(t) % 1.0;
     const expand_t = sanitized_t * this.curves.length;
     const curve_index = Math.floor(expand_t);
@@ -51,7 +40,6 @@ export class Spline {
       let t = 0.0;
       for (let i = 0; i < this.num_points_per_curve; ++i){
         this.array_points[i + this.num_points_per_curve * index] = curve.getPoint(t);
-        this.array_colors[i + this.num_points_per_curve * index] = curve.getColorInPoint(t);
         t += increment;
       }
       // Ensure last point is t = 1.0
@@ -84,7 +72,7 @@ export class Spline {
     this.array_points[this.num_points_per_curve - 1 + this.num_points_per_curve * index] = this.curves[index].getPoint(1.0);
   }
 
-  public updatePoint(index : number, new_point : Vec) : boolean {
+  public updatePoint(index : number, new_point : glm.vec4) : boolean {
     if (index < 0 || index >= this.curves.length * 4) { return false; }
 
     const index_curve = Math.floor(index / 4);
@@ -98,10 +86,10 @@ export class Spline {
     return true;
   }
 
-  public indexControlPoint(radius:number = 0.1, point : Vec) : number {
+  public indexControlPoint(radius:number = 0.1, point : glm.vec4) : number {
     for (let i = this.curves.length - 1; i >= 0; --i) {
       for (let c = 0; c < 4; ++c) {
-        const dist = point.sub(this.curves[i].getControlPoints[c]).mag();
+        const dist = glm.vec4.dist(point, this.curves[i].getControlPoints[c]);
         if ( dist <= radius ) {
           return i * 4 + c;
         }
@@ -117,7 +105,7 @@ export class Spline {
 
   public isC0Continuous() : boolean {
     for (let i = 0; i < this.curves.length - 1; ++i) {
-      const equals = this.curves[i].getControlPoints[3].equals(this.curves[i+1].getControlPoints[0]);
+      const equals = glm.vec4.equals(this.curves[i].getControlPoints[3], this.curves[i+1].getControlPoints[0]);
       if (!equals) return false;
     }
     return true;
@@ -128,13 +116,7 @@ export class Spline {
     for (let i=0; i < this.curves.length; ++i) {
       for (let c = 0; c < 4; ++c){
         const control_point = this.curves[i].getControlPoints[c];
-        res += `v ${control_point.x} ${control_point.y} ${control_point.z}\n`;
-      }
-    }
-    for (let i=0; i < this.curves.length; ++i) {
-      for (let c = 0; c < 4; ++c){
-        const colors_points = this.curves[i].getControlPointsColor[c];
-        res += `c ${colors_points.x} ${colors_points.y} ${colors_points.z}\n`;
+        res += `v ${control_point[0]} ${control_point[1]} ${control_point[2]}\n`;
       }
     }
     return res;
@@ -143,28 +125,20 @@ export class Spline {
   public static fromOBJ(obj : string, sampling_points : number = 128) : Spline {
     let spline = new Spline(sampling_points);
 
-    const arrayVertices = new Array<Vec>();
-    const arrayColors = new Array<Vec>();
+    const arrayVertices = new Array<glm.vec4>();
+    const arrayColors = new Array<glm.vec4>();
     
     obj.split("\n").forEach((line) => {
       if (line[0] == "v"){
         const values = line.split(" ");
         if (values.length == 4){
-          let new_val = new Vec();
-          new_val.x = parseFloat(values[1]);
-          new_val.y = parseFloat(values[2]);
-          new_val.z = parseFloat(values[3]);
+          let new_val = glm.vec4.fromValues(
+            parseFloat(values[1]),
+            parseFloat(values[2]),
+            parseFloat(values[3]),
+            0.0
+          );
           arrayVertices.push(new_val);
-        }
-      }
-      else if (line[0] == "c") {
-        const values = line.split(" ");
-        if (values.length == 4){
-          let new_val = new Vec();
-          new_val.x = parseFloat(values[1]);
-          new_val.y = parseFloat(values[2]);
-          new_val.z = parseFloat(values[3]);
-          arrayColors.push(new_val);
         }
       }
     });
@@ -177,10 +151,6 @@ export class Spline {
         arrayVertices[i * 4 + 1],
         arrayVertices[i * 4 + 2],
         arrayVertices[i * 4 + 3],
-        arrayColors[i * 4 + 0],
-        arrayColors[i * 4 + 1],
-        arrayColors[i * 4 + 2],
-        arrayColors[i * 4 + 3],
       );
       
       spline.addCurve(curve);
@@ -189,7 +159,6 @@ export class Spline {
     return spline;
   }
 
-  public get getPointsInSpline() : Array<Vec> | null { return this.array_points; }
+  public get getPointsInSpline() : Array<glm.vec4> | null { return this.array_points; }
   public set setNumPoints(value:number) { this.num_points_per_curve = value; this.sampleSpline(); }
-  
 }
