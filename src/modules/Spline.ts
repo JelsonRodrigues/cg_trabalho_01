@@ -4,7 +4,7 @@ import {CubicBezierCurve} from "./CubicBezierCurve.js"
 export class Spline {
   private curves : Array<CubicBezierCurve>;
   private num_points_per_curve : number;
-  public array_points : Array<glm.vec4>;
+  public array_points : Array<glm.vec3>;
 
   constructor (numPoints : number = 128) {
     this.num_points_per_curve = numPoints;
@@ -16,7 +16,7 @@ export class Spline {
     this.curves.push(curve);
   }
 
-  public getPoint(t:number) : glm.vec4 {
+  public getPoint(t:number) : glm.vec3 {
     const sanitized_t = Math.abs(t) % 1.0;
     const expand_t = sanitized_t * this.curves.length;
     const curve_index = Math.floor(expand_t);
@@ -25,7 +25,7 @@ export class Spline {
     return this.curves[curve_index].getPoint(new_t);
   }
 
-  public getPointTangent(t:number) : glm.vec4 {
+  public getPointTangent(t:number) : glm.vec3 {
     const sanitized_t = Math.abs(t) % 1.0;
     const expand_t = sanitized_t * this.curves.length;
     const curve_index = Math.floor(expand_t);
@@ -72,7 +72,7 @@ export class Spline {
     this.array_points[this.num_points_per_curve - 1 + this.num_points_per_curve * index] = this.curves[index].getPoint(1.0);
   }
 
-  public updatePoint(index : number, new_point : glm.vec4) : boolean {
+  public updatePoint(index : number, new_point : glm.vec3) : boolean {
     if (index < 0 || index >= this.curves.length * 4) { return false; }
 
     const index_curve = Math.floor(index / 4);
@@ -86,10 +86,10 @@ export class Spline {
     return true;
   }
 
-  public indexControlPoint(radius:number = 0.1, point : glm.vec4) : number {
+  public indexControlPoint(radius:number = 0.1, point : glm.vec3) : number {
     for (let i = this.curves.length - 1; i >= 0; --i) {
       for (let c = 0; c < 4; ++c) {
-        const dist = glm.vec4.dist(point, this.curves[i].getControlPoints[c]);
+        const dist = glm.vec3.dist(point, this.curves[i].getControlPoints[c]);
         if ( dist <= radius ) {
           return i * 4 + c;
         }
@@ -105,7 +105,7 @@ export class Spline {
 
   public isC0Continuous() : boolean {
     for (let i = 0; i < this.curves.length - 1; ++i) {
-      const equals = glm.vec4.equals(this.curves[i].getControlPoints[3], this.curves[i+1].getControlPoints[0]);
+      const equals = glm.vec3.equals(this.curves[i].getControlPoints[3], this.curves[i+1].getControlPoints[0]);
       if (!equals) return false;
     }
     return true;
@@ -125,18 +125,17 @@ export class Spline {
   public static fromOBJ(obj : string, sampling_points : number = 128) : Spline {
     let spline = new Spline(sampling_points);
 
-    const arrayVertices = new Array<glm.vec4>();
-    const arrayColors = new Array<glm.vec4>();
+    const arrayVertices = new Array<glm.vec3>();
+    const arrayColors = new Array<glm.vec3>();
     
     obj.split("\n").forEach((line) => {
       if (line[0] == "v"){
         const values = line.split(" ");
         if (values.length == 4){
-          let new_val = glm.vec4.fromValues(
+          let new_val = glm.vec3.fromValues(
             parseFloat(values[1]),
             parseFloat(values[2]),
             parseFloat(values[3]),
-            0.0
           );
           arrayVertices.push(new_val);
         }
@@ -159,6 +158,6 @@ export class Spline {
     return spline;
   }
 
-  public get getPointsInSpline() : Array<glm.vec4> | null { return this.array_points; }
+  public get getPointsInSpline() : Array<glm.vec3> | null { return this.array_points; }
   public set setNumPoints(value:number) { this.num_points_per_curve = value; this.sampleSpline(); }
 }

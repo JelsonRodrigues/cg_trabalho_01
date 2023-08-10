@@ -12,18 +12,21 @@ var spline : Spline;
 
 
 async function main() {
-  spline = new Spline(0);
+  spline = new Spline(1);
   const curve = new CubicBezierCurve(
-    [0.0, 0.0, -1.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 1.0, 0.0]);
+    [-10.0, 0.0, -10.0],
+    [-10.0, 0.0, 0.0],
+    [-10.0, 0.0, 0.0],
+    [-10.0, 0.0, 10.0]);
+
+  const curve2 = new CubicBezierCurve(
+    [-10.0, 0.0, 10.0],
+    [0.0, 10.0, 5.0],
+    [5.0, 15.0, -5.0],
+    [1.0, 5.0, -10.0]);
     
-  console.log(curve.getPoint(0.0));
-  console.log(curve.getPoint(1.0));
-  return;
-  
   spline.addCurve(curve);
+  spline.addCurve(curve2);
 
   // Get canvas
   const canva = document.getElementById("mainCanvas") as HTMLCanvasElement;

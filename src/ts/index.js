@@ -45,12 +45,11 @@ var gl_handler;
 var spline;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        spline = new Spline_1.Spline(0);
-        const curve = new CubicBezierCurve_1.CubicBezierCurve([0.0, 0.0, -1.0, 0.0], [0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0]);
-        console.log(curve.getPoint(0.0));
-        console.log(curve.getPoint(1.0));
-        return;
+        spline = new Spline_1.Spline(1);
+        const curve = new CubicBezierCurve_1.CubicBezierCurve([-10.0, 0.0, -10.0], [-10.0, 0.0, 0.0], [-10.0, 0.0, 0.0], [-10.0, 0.0, 10.0]);
+        const curve2 = new CubicBezierCurve_1.CubicBezierCurve([-10.0, 0.0, 10.0], [0.0, 10.0, 5.0], [5.0, 15.0, -5.0], [1.0, 5.0, -10.0]);
         spline.addCurve(curve);
+        spline.addCurve(curve2);
         // Get canvas
         const canva = document.getElementById("mainCanvas");
         canvasResize(canva);
