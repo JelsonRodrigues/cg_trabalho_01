@@ -37,11 +37,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const glm = __importStar(require("gl-matrix"));
 const gl_1 = require("./gl");
+const Spline_1 = require("../modules/Spline");
 const vertexShader_glsl_1 = __importDefault(require("../shaders/vertexShader.glsl"));
 const fragmentShader_glsl_1 = __importDefault(require("../shaders/fragmentShader.glsl"));
+const CubicBezierCurve_1 = require("../modules/CubicBezierCurve");
 var gl_handler;
+var spline;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
+        spline = new Spline_1.Spline(0);
+        const curve = new CubicBezierCurve_1.CubicBezierCurve([0.0, 0.0, -1.0, 0.0], [0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0]);
+        console.log(curve.getPoint(0.0));
+        console.log(curve.getPoint(1.0));
+        return;
+        spline.addCurve(curve);
         // Get canvas
         const canva = document.getElementById("mainCanvas");
         canvasResize(canva);
@@ -98,17 +107,19 @@ const perspective = glm.mat4.create();
 glm.mat4.perspective(perspective, field_of_view, aspect_ratio, near, far);
 function animateTiangle() {
     const now = Date.now();
-    const percent_animation = (now - start) / full_rotation;
+    const percent_animation = ((now - start) / full_rotation) % 1.0;
     const angle = Math.PI * 2 * percent_animation;
     // // Create model matrix
     const model = glm.mat4.create();
     glm.mat4.identity(model);
     glm.mat4.scale(model, model, [1.0 / 30.0, -1.0 / 30.0, 1.0 / 30.0]);
-    glm.mat4.translate(model, model, [Math.sin(angle / 2) * 300, 0.0, 0.0]);
+    // glm.mat4.translate(model, model, [Math.sin(angle/2) * 300, 0.0, 0.0]);
     // Create view matrix
     const radius = 10.0;
     // const camera_position_in_world : glm.vec3 = [Math.cos(angle) * radius, 0.0, Math.sin(angle) * radius];
-    const camera_position_in_world = [15, 0, 15];
+    const location_spline = spline.getPoint(percent_animation);
+    // console.log(location_spline, "t = ", percent_animation);
+    const camera_position_in_world = [location_spline[0], location_spline[1], location_spline[2]];
     const up_position = [0.0, 1.0, 0.0];
     const look_at = [0.0, 0.0, 0.0];
     const camera = glm.mat4.create();

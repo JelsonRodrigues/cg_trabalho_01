@@ -11,17 +11,64 @@ export class CubicBezierCurve {
   }
 
   private calcCoeffVector(P0 : glm.vec4, P1: glm.vec4, P2: glm.vec4, P3: glm.vec4){
-    const coeff_values_matrix = glm.mat4.fromValues(
-      1.0, 0.0, 0.0, 0.0,
-      -3.0, 3.0, 0.0, 0.0,
-      3.0, -6.0, 3.0, 0.0,
-      -1.0, 3.0, -3.0, 1.0
+    const _ = glm.vec4.create();
+    
+    this.coeff_vector[0] = glm.vec4.add(
+      _,
+      glm.vec4.add(
+        _,
+        glm.vec4.scale(_, P0, 1.0),
+        glm.vec4.scale(_, P1, 0.0),
+      ),
+      glm.vec4.add(
+        _,
+        glm.vec4.scale(_, P2, 0.0),
+        glm.vec4.scale(_, P3, 0.0),
+      )
     );
 
-    glm.vec4.transformMat4(this.coeff_vector[0], P0, coeff_values_matrix);
-    glm.vec4.transformMat4(this.coeff_vector[1], P1, coeff_values_matrix);
-    glm.vec4.transformMat4(this.coeff_vector[2], P2, coeff_values_matrix);
-    glm.vec4.transformMat4(this.coeff_vector[3], P3, coeff_values_matrix);
+    this.coeff_vector[1] = glm.vec4.add(
+      _,
+      glm.vec4.add(
+        _,
+        glm.vec4.scale(_, P0, -3.0),
+        glm.vec4.scale(_, P1, 3.0),
+      ),
+      glm.vec4.add(
+        _,
+        glm.vec4.scale(_, P2, 0.0),
+        glm.vec4.scale(_, P3, 0.0),
+      )
+    );
+
+    this.coeff_vector[2] = glm.vec4.add(
+      _,
+      glm.vec4.add(
+        _,
+        glm.vec4.scale(_, P0, 3.0),
+        glm.vec4.scale(_, P1, -6.0),
+      ),
+      glm.vec4.add(
+        _,
+        glm.vec4.scale(_, P2, 3.0),
+        glm.vec4.scale(_, P3, 0.0),
+      )
+    );
+
+    this.coeff_vector[3] = glm.vec4.add(
+      _,
+      glm.vec4.add(
+        _,
+        glm.vec4.scale(_, P0, -1.0),
+        glm.vec4.scale(_, P1, 3.0),
+      ),
+      glm.vec4.add(
+        _,
+        glm.vec4.scale(_, P2, -3.0),
+        glm.vec4.scale(_, P3, 1.0),
+      )
+    );
+    console.log("Coeef values: ", this.coeff_vector[0], this.coeff_vector[1], this.coeff_vector[2], this.coeff_vector[3]);
   }
 
   public getPoint(t:number) : glm.vec4 {

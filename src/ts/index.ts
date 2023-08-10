@@ -1,12 +1,30 @@
 import * as glm from "gl-matrix";
 import { gl, WebGLUtils } from "./gl";
 
+import { Spline } from "../modules/Spline";
+
 import vertexShader from "../shaders/vertexShader.glsl";
 import fragmentShader from "../shaders/fragmentShader.glsl";
+import { CubicBezierCurve } from "../modules/CubicBezierCurve";
 
 var gl_handler : gl; 
+var spline : Spline;
+
 
 async function main() {
+  spline = new Spline(0);
+  const curve = new CubicBezierCurve(
+    [0.0, 0.0, -1.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 1.0, 0.0]);
+    
+  console.log(curve.getPoint(0.0));
+  console.log(curve.getPoint(1.0));
+  return;
+  
+  spline.addCurve(curve);
+
   // Get canvas
   const canva = document.getElementById("mainCanvas") as HTMLCanvasElement;
   canvasResize(canva);
@@ -79,19 +97,23 @@ glm.mat4.perspective(perspective, field_of_view, aspect_ratio, near, far);
 function animateTiangle() {
 
   const now = Date.now();
-  const percent_animation = (now - start) / full_rotation;
+  const percent_animation = ((now - start) / full_rotation) % 1.0;
   const angle = Math.PI * 2 * percent_animation;
 
   // // Create model matrix
   const model = glm.mat4.create();
   glm.mat4.identity(model);
   glm.mat4.scale(model, model, [1.0/30.0, -1.0/30.0, 1.0/30.0]);
-  glm.mat4.translate(model, model, [Math.sin(angle/2) * 300, 0.0, 0.0]);
+  // glm.mat4.translate(model, model, [Math.sin(angle/2) * 300, 0.0, 0.0]);
 
   // Create view matrix
   const radius = 10.0
   // const camera_position_in_world : glm.vec3 = [Math.cos(angle) * radius, 0.0, Math.sin(angle) * radius];
-  const camera_position_in_world : glm.vec3 = [15, 0, 15];
+  
+  const location_spline = spline.getPoint(percent_animation);
+  // console.log(location_spline, "t = ", percent_animation);
+  
+  const camera_position_in_world : glm.vec3 = [location_spline[0], location_spline[1], location_spline[2]];
   const up_position : glm.vec3 = [0.0, 1.0, 0.0];
   const look_at : glm.vec3 = [0.0, 0.0, 0.0];
 
