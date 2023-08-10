@@ -20,8 +20,6 @@ export class CubicBezierCurve {
     this.coeff_vector[0] = glm.vec3.clone(temp);
     glm.vec3.zero(temp);
 
-    console.log("coeff vector 0 = ", this.coeff_vector[0]);
-
     glm.vec3.scaleAndAdd(temp, temp, P0, -3.0);
     glm.vec3.scaleAndAdd(temp, temp, P1, 3.0);
     glm.vec3.scaleAndAdd(temp, temp, P2, 0.0);
@@ -42,8 +40,6 @@ export class CubicBezierCurve {
     glm.vec3.scaleAndAdd(temp, temp, P3, 1.0);
     this.coeff_vector[3] = glm.vec3.clone(temp);
     glm.vec3.zero(temp);
-
-    console.log("Coeef values: ", this.coeff_vector[0], this.coeff_vector[1], this.coeff_vector[2], this.coeff_vector[3]);
   }
 
   public getPoint(t:number) : glm.vec3 {

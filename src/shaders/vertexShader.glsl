@@ -20,4 +20,5 @@ uniform mat4x4 model;
 
 void main() {
   gl_Position = projection * view * model * position;
+  gl_PointSize = 15.0;
 }

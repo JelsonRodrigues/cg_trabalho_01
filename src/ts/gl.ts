@@ -14,9 +14,12 @@ export class gl {
 
   // Buffers 
   public buffer_triangle_vertices : WebGLBuffer;
-
+  public buffer_control_points : WebGLBuffer;
+  public buffer_pyramid_vertices : WebGLBuffer;
+  public buffer_pyramid_indices : WebGLBuffer;
+  
   // Vertex Array Objects
-
+  public vao_pyramid : WebGLVertexArrayObject;
 
   constructor (canva : HTMLCanvasElement, vsSource : string, fsSource : string) {
     this.gl = canva.getContext("webgl2") as WebGL2RenderingContext;
@@ -36,41 +39,13 @@ export class gl {
     this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
     this.buffer_triangle_vertices = this.gl.createBuffer() as WebGLBuffer;
+    this.buffer_control_points = this.gl.createBuffer() as WebGLBuffer;
+    this.buffer_pyramid_vertices = this.gl.createBuffer() as WebGLBuffer;
+    this.buffer_pyramid_indices = this.gl.createBuffer() as WebGLBuffer;
+    
 
     this.gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, this.buffer_triangle_vertices);
-    // const data = [
-    //   -1.00, 0, 0.60,
-    //   0, 0.60, 0.40,
-    //   1.00, 0, 0.60,
-    //   -1.00, 0, 0.0,
-    //   0, 0.60, 0.0,
-    //   1.00, 0, 0.0,
-    // ];
-    // const data = [
-    // // left column
-    // 0, 0, 0,
-    // 30, 0, 0,
-    // 0, 150, 0,
-    // 0, 150, 0,
-    // 30, 0, 0,
-    // 30, 150, 0,
-
-    // // top rung
-    // 30, 0, 0,
-    // 100, 0, 0,
-    // 30, 30, 0,
-    // 30, 30, 0,
-    // 100, 0, 0,
-    // 100, 30, 0,
-
-    // // middle rung
-    // 30, 60, 0,
-    // 67, 60, 0,
-    // 30, 90, 0,
-    // 30, 90, 0,
-    // 67, 60, 0,
-    // 67, 90, 0];
-
+  
     const data = [
       // left column front
       0,   0,  0,
@@ -223,6 +198,34 @@ export class gl {
     this.gl.drawArrays(WebGL2RenderingContext.TRIANGLES, 0, 16*6);
   }
 
+  public drawControlPoints(number_points: number, model : mat4, view : mat4, projection : mat4) {
+    this.gl.useProgram(this.program);
+    this.gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, this.buffer_control_points);
+
+    this.gl.enableVertexAttribArray(this.a_position);
+    this.gl.vertexAttribPointer(this.a_position, 3, WebGL2RenderingContext.FLOAT, false, 3 * Float32Array.BYTES_PER_ELEMENT, 0 * Float32Array.BYTES_PER_ELEMENT);
+
+    this.gl.uniformMatrix4fv(this.u_model, false, model);
+    this.gl.uniformMatrix4fv(this.u_view, false, view);
+    this.gl.uniformMatrix4fv(this.u_projection, false, projection);
+
+    this.gl.drawArrays(WebGL2RenderingContext.LINE_STRIP, 0, number_points);
+  }
+
+  public drawPyramid(model : mat4, view : mat4, projection : mat4) {
+    this.gl.useProgram(this.program);
+    this.gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, this.buffer_pyramid_vertices);
+
+    this.gl.enableVertexAttribArray(this.a_position);
+    this.gl.vertexAttribPointer(this.a_position, 3, WebGL2RenderingContext.FLOAT, false, 3 * Float32Array.BYTES_PER_ELEMENT, 0 * Float32Array.BYTES_PER_ELEMENT);
+
+    this.gl.uniformMatrix4fv(this.u_model, false, model);
+    this.gl.uniformMatrix4fv(this.u_view, false, view);
+    this.gl.uniformMatrix4fv(this.u_projection, false, projection);
+
+    // this.gl.drawElements(WebGL2RenderingContext.TRIANGLES, 6*3, 0, );
+  }
+
   static createShader(gl: WebGL2RenderingContext, type : number, source:string) : WebGLShader | null{
     const shader = gl.createShader(type);
     if (shader){
@@ -255,7 +258,6 @@ export class gl {
     }
     return null;
   }
-
 } 
 
 export module WebGLUtils {
@@ -272,9 +274,9 @@ export module WebGLUtils {
   export async function readObj(filePath:string) : Promise<[Array<number>, Array<number>, Array<number>, Array<number>, Array<number>, Array<number>]> {
     const obj_content = await readFile(filePath);
 
-    const vertexArray = [0.0, 0.0, 0.0];
-    const vertexTextCoordArray = [0.0, 0.0];
-    const vertexNormalArray = [0.0, 0.0, 0.0];
+    const vertexArray = new Array();
+    const vertexTextCoordArray = new Array();
+    const vertexNormalArray = new Array();
 
     const vertexIndexArray = new Array();
     const vertexIndexTextCoordArray = new Array();
@@ -305,13 +307,13 @@ export module WebGLUtils {
         for (let index = 1; index < elements.length; ++index) {
           const values = elements[index].trim().split(/\//);
           if (values.length >= 1) {
-            vertexIndexArray.push(parseInt(values[0]));
+            vertexIndexArray.push(parseInt(values[0]) - 1);
           }
           if (values.length >= 2) {
-            vertexIndexTextCoordArray.push(parseInt(values[1]));
+            vertexIndexTextCoordArray.push(parseInt(values[1]) - 1);
           }
           if (values.length >= 3) {
-            vertexIndexNormalArray.push(parseInt(values[2]));
+            vertexIndexNormalArray.push(parseInt(values[2]) - 1);
           }
         }
       }

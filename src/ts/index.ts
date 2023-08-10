@@ -12,21 +12,32 @@ var spline : Spline;
 
 
 async function main() {
-  spline = new Spline(1);
+  // Try read a OBJ
+  const obj_data = WebGLUtils.readObj("./objects/pyramid.obj");
+  
+  spline = new Spline(30);
   const curve = new CubicBezierCurve(
     [-10.0, 0.0, -10.0],
-    [-10.0, 0.0, 0.0],
-    [-10.0, 0.0, 0.0],
-    [-10.0, 0.0, 10.0]);
+    [-5.0, -5.0, -30.0],
+    [5.0, -5.0, -30.0],
+    [0.0, 0.0, 10.0]);
 
   const curve2 = new CubicBezierCurve(
-    [-10.0, 0.0, 10.0],
+    [0.0, 0.0, 10.0],
     [0.0, 10.0, 5.0],
     [5.0, 15.0, -5.0],
     [1.0, 5.0, -10.0]);
-    
+
+  const curve3 = new CubicBezierCurve(
+    [1.0, 5.0, -10.0],
+    [-10.0, 6.0, -5.0],
+    [-6.0, 7.0, 5.0],
+    [5.0, 4.0, -5.0]);
+  
   spline.addCurve(curve);
   spline.addCurve(curve2);
+  spline.addCurve(curve3);
+  spline.sampleSpline();
 
   // Get canvas
   const canva = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -35,36 +46,27 @@ async function main() {
   const vsSource = vertexShader;
   const fsSource = fragmentShader;
   gl_handler = new gl(canva, vsSource, fsSource);  
+  
+  const buffer_pyramid = gl_handler.gl.createBuffer();
+  gl_handler.gl.bindBuffer(WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER, buffer_pyramid);
 
-  console.log(gl_handler);
+  const spline_points = new Array();
+  spline.array_points.forEach((vec) => {
+    spline_points.push(vec[0]);
+    spline_points.push(vec[1]);
+    spline_points.push(vec[2]);
+  });
+
+  gl_handler.gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, gl_handler.buffer_control_points);
+  gl_handler.gl.bufferData(
+    WebGL2RenderingContext.ARRAY_BUFFER, 
+    new Float32Array(spline_points), 
+    WebGL2RenderingContext.STATIC_DRAW
+  );
+
   gl_handler.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
 
-  // Create model matrix
-  const model = glm.mat4.create();
-  glm.mat4.identity(model);
-  glm.mat4.rotateZ(model, model, Math.PI / 36);
-  console.log(model);
-
-  // Create view matrix
-  const camera_position_in_world : glm.vec3 = [0, 0, 2.0];
-  const up_position : glm.vec3 = [0.0, 1.0, 0.0];
-  const look_at : glm.vec3 = [0.0, 0.0, 5.0];
-
-  const camera = glm.mat4.create();
-  glm.mat4.lookAt(camera, camera_position_in_world, look_at, up_position);
-
-  // Create perspective matrix
-  const field_of_view = Math.PI / 4.0;
-  const near = 1;
-  const far = 1000;
-  const aspect_ratio = canva.width / canva.height;
-  const perspective = glm.mat4.create();
-  glm.mat4.perspective(perspective, field_of_view, aspect_ratio, near, far);
-  console.log(perspective);
-
   gl_handler.gl.viewport(0, 0, canva.width, canva.height);
-
-  gl_handler.drawTriangle(model, camera, perspective);
 
   start = Date.now();
   animateTiangle();
@@ -114,11 +116,18 @@ function animateTiangle() {
   // const camera_position_in_world : glm.vec3 = [Math.cos(angle) * radius, 0.0, Math.sin(angle) * radius];
   
   const location_spline = spline.getPoint(percent_animation);
-  // console.log(location_spline, "t = ", percent_animation);
+  const looking_at_tangent = spline.getPointTangent(percent_animation);
+  glm.vec3.normalize(looking_at_tangent, looking_at_tangent);
+  glm.vec3.add(looking_at_tangent, looking_at_tangent, location_spline);
   
   const camera_position_in_world : glm.vec3 = [location_spline[0], location_spline[1], location_spline[2]];
   const up_position : glm.vec3 = [0.0, 1.0, 0.0];
-  const look_at : glm.vec3 = [0.0, 0.0, 0.0];
+  // const look_at : glm.vec3 = looking_at_tangent;
+
+  // const camera_position_in_world : glm.vec3 = [20, 3, 15];
+  // const up_position : glm.vec3 = [0.0, 1.0, 0.0];
+  const look_at : glm.vec3 = glm.vec3.transformMat4(glm.vec3.create(), [0,0,0], model); // Look at the F
+  // const look_at : glm.vec3 = [0,0,0];
 
   const camera = glm.mat4.create();
   glm.mat4.lookAt(camera, camera_position_in_world, look_at, up_position);
@@ -131,7 +140,10 @@ function animateTiangle() {
 
   gl_handler.drawTriangle(model, camera, perspective);
   
-  // if (percent_animation <= 1.0) {requestAnimationFrame(animateTiangle);}
+  /* Draw the Control points */
+  glm.mat4.identity(model);
+  gl_handler.drawControlPoints(spline.array_points.length, model, camera, perspective);
+
   requestAnimationFrame(animateTiangle);
 }
 

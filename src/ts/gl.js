@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebGLUtils = exports.gl = void 0;
 class gl {
-    // Vertex Array Objects
     constructor(canva, vsSource, fsSource) {
         this.gl = canva.getContext("webgl2");
         this.program = gl.createProgram(this.gl, gl.createShader(this.gl, WebGL2RenderingContext.VERTEX_SHADER, vsSource), gl.createShader(this.gl, WebGL2RenderingContext.FRAGMENT_SHADER, fsSource));
@@ -22,37 +21,10 @@ class gl {
         this.u_projection = this.gl.getUniformLocation(this.program, "projection");
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         this.buffer_triangle_vertices = this.gl.createBuffer();
+        this.buffer_control_points = this.gl.createBuffer();
+        this.buffer_pyramid_vertices = this.gl.createBuffer();
+        this.buffer_pyramid_indices = this.gl.createBuffer();
         this.gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, this.buffer_triangle_vertices);
-        // const data = [
-        //   -1.00, 0, 0.60,
-        //   0, 0.60, 0.40,
-        //   1.00, 0, 0.60,
-        //   -1.00, 0, 0.0,
-        //   0, 0.60, 0.0,
-        //   1.00, 0, 0.0,
-        // ];
-        // const data = [
-        // // left column
-        // 0, 0, 0,
-        // 30, 0, 0,
-        // 0, 150, 0,
-        // 0, 150, 0,
-        // 30, 0, 0,
-        // 30, 150, 0,
-        // // top rung
-        // 30, 0, 0,
-        // 100, 0, 0,
-        // 30, 30, 0,
-        // 30, 30, 0,
-        // 100, 0, 0,
-        // 100, 30, 0,
-        // // middle rung
-        // 30, 60, 0,
-        // 67, 60, 0,
-        // 30, 90, 0,
-        // 30, 90, 0,
-        // 67, 60, 0,
-        // 67, 90, 0];
         const data = [
             // left column front
             0, 0, 0,
@@ -180,6 +152,26 @@ class gl {
         this.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT | WebGL2RenderingContext.DEPTH_BUFFER_BIT);
         this.gl.drawArrays(WebGL2RenderingContext.TRIANGLES, 0, 16 * 6);
     }
+    drawControlPoints(number_points, model, view, projection) {
+        this.gl.useProgram(this.program);
+        this.gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, this.buffer_control_points);
+        this.gl.enableVertexAttribArray(this.a_position);
+        this.gl.vertexAttribPointer(this.a_position, 3, WebGL2RenderingContext.FLOAT, false, 3 * Float32Array.BYTES_PER_ELEMENT, 0 * Float32Array.BYTES_PER_ELEMENT);
+        this.gl.uniformMatrix4fv(this.u_model, false, model);
+        this.gl.uniformMatrix4fv(this.u_view, false, view);
+        this.gl.uniformMatrix4fv(this.u_projection, false, projection);
+        this.gl.drawArrays(WebGL2RenderingContext.LINE_STRIP, 0, number_points);
+    }
+    drawPyramid(model, view, projection) {
+        this.gl.useProgram(this.program);
+        this.gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, this.buffer_pyramid_vertices);
+        this.gl.enableVertexAttribArray(this.a_position);
+        this.gl.vertexAttribPointer(this.a_position, 3, WebGL2RenderingContext.FLOAT, false, 3 * Float32Array.BYTES_PER_ELEMENT, 0 * Float32Array.BYTES_PER_ELEMENT);
+        this.gl.uniformMatrix4fv(this.u_model, false, model);
+        this.gl.uniformMatrix4fv(this.u_view, false, view);
+        this.gl.uniformMatrix4fv(this.u_projection, false, projection);
+        // this.gl.drawElements(WebGL2RenderingContext.TRIANGLES, 6*3, 0, );
+    }
     static createShader(gl, type, source) {
         const shader = gl.createShader(type);
         if (shader) {
@@ -226,9 +218,9 @@ var WebGLUtils;
     function readObj(filePath) {
         return __awaiter(this, void 0, void 0, function* () {
             const obj_content = yield readFile(filePath);
-            const vertexArray = [0.0, 0.0, 0.0];
-            const vertexTextCoordArray = [0.0, 0.0];
-            const vertexNormalArray = [0.0, 0.0, 0.0];
+            const vertexArray = new Array();
+            const vertexTextCoordArray = new Array();
+            const vertexNormalArray = new Array();
             const vertexIndexArray = new Array();
             const vertexIndexTextCoordArray = new Array();
             const vertexIndexNormalArray = new Array();
@@ -257,13 +249,13 @@ var WebGLUtils;
                     for (let index = 1; index < elements.length; ++index) {
                         const values = elements[index].trim().split(/\//);
                         if (values.length >= 1) {
-                            vertexIndexArray.push(parseInt(values[0]));
+                            vertexIndexArray.push(parseInt(values[0]) - 1);
                         }
                         if (values.length >= 2) {
-                            vertexIndexTextCoordArray.push(parseInt(values[1]));
+                            vertexIndexTextCoordArray.push(parseInt(values[1]) - 1);
                         }
                         if (values.length >= 3) {
-                            vertexIndexNormalArray.push(parseInt(values[2]));
+                            vertexIndexNormalArray.push(parseInt(values[2]) - 1);
                         }
                     }
                 }
