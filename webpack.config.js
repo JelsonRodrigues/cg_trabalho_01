@@ -3,6 +3,7 @@ const path = require('path');
  module.exports = {
   entry: {
     index: './src/ts/index.js',
+    
   },
   output: {
     filename: 'main.js',
@@ -14,5 +15,5 @@ const path = require('path');
         loader: 'webpack-glsl-loader'
       }
     ]
-   }
+   },
  };

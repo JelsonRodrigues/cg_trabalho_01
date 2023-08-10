@@ -27,11 +27,10 @@ async function main() {
   // Create view matrix
   const camera_position_in_world : glm.vec3 = [0, 0, 2.0];
   const up_position : glm.vec3 = [0.0, 1.0, 0.0];
-  const look_at : glm.vec3 = [0.0, 0.0, 0.0];
+  const look_at : glm.vec3 = [0.0, 0.0, 5.0];
 
   const camera = glm.mat4.create();
-  glm.mat4.targetTo(camera, camera_position_in_world, look_at, up_position);
-  console.log("targetTo ", camera);
+  glm.mat4.lookAt(camera, camera_position_in_world, look_at, up_position);
 
   // Create perspective matrix
   const field_of_view = Math.PI / 4.0;
@@ -77,8 +76,6 @@ const aspect_ratio = canva.width / canva.height;
 const perspective = glm.mat4.create();
 glm.mat4.perspective(perspective, field_of_view, aspect_ratio, near, far);
 
-// glm.mat4.ortho(perspective, -5, 5, -5, 5, 0.1, 1000);
-
 function animateTiangle() {
 
   const now = Date.now();
@@ -100,6 +97,12 @@ function animateTiangle() {
 
   const camera = glm.mat4.create();
   glm.mat4.lookAt(camera, camera_position_in_world, look_at, up_position);
+  // A funcao lookAt cria a camera a funcao targetTo cria a matriz da camera
+  // Uma e o inverso da outra, inverso(lookAt) == targetTo && lookAt == inverso(targetTo)
+  // Para fazer um objeto olhar para outro, usa-se a targetTo, para criar a camera, que possui
+  // a posicao do olho, up vector ... e depois a mudanca de base usa-se a lookAt
+  // Por algum motivo a inversa nao e igual a transposta, deveria. Mas pode ser que os vetores que 
+  // eu estou inserindo nao sao normalizados e/ou ortogonais??
 
   gl_handler.drawTriangle(model, camera, perspective);
   

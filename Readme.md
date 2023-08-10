@@ -1,5 +1,15 @@
 # Trabalho 01 de Computacao Grafica
 
+# Run 
+```
+git clone https://github.com/JelsonRodrigues/cg_trabalho_01
+cd cg_trabalho_01
+npm install
+tsc
+npx webpack
+// Start server
+```
+
 # Todo!
 - [x] Create folders skeleton
 - [x] Create matrix handling functions
