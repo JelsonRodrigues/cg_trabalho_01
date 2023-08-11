@@ -1,12 +1,12 @@
 import { DrawableObject} from "./DrawableObject";
 import * as glm from "gl-matrix";
 
-import { gl as glHelper, WebGLUtils} from "./gl";
+import { gl as glHelper} from "./gl";
 
 import vertexSource from "../shaders/vertexShader.glsl";
-import fragmentSource from "../shaders/fragmentShader.glsl";
+import fragmentSource from "../shaders/groundFragmentShader.glsl";
 
-export class Pyramid extends DrawableObject {
+export class Ground extends DrawableObject {
   private vao : WebGLVertexArrayObject;
   private buffer_vertices : WebGLBuffer;
   private buffer_index_vertices : WebGLBuffer;
@@ -20,7 +20,7 @@ export class Pyramid extends DrawableObject {
   constructor (gl : WebGL2RenderingContext) {
     super();
     this.model = glm.mat4.create();
-    glm.mat4.scale(this.model, this.model, [500, 500, 500]);
+    glm.mat4.scale(this.model, this.model, [50, 0, 20]);
     
     // Create the program
     this.program = glHelper.createProgram(
@@ -85,33 +85,36 @@ export class Pyramid extends DrawableObject {
 
     // Unbind VAO to other gl calls do not modify it
     gl.bindVertexArray(null);
-  } 
-    
+  }
   
   override setup(gl: WebGL2RenderingContext): void {
-    const data = WebGLUtils.readObj("./objects/pyramid.obj").then(
-      ([vertexArray, vertexTextCoordArray, vertexNormalArray, 
-        vertexIndexArray, vertexIndexTextCoordArray, vertexIndexNormalArray]) => {
-          console.log("Vertex Array ", vertexArray);
-          console.log("Vertex Index Array ", vertexIndexArray);
+    const data = [
+      1.0, 0.0, 1.0,
+      1.0, 0.0, -1.0,
+      -1.0, 0.0, -1.0,
+      -1.0, 0.0, 1.0,
+    ];
 
-          gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, this.buffer_vertices);
-          gl.bufferData(
-            WebGL2RenderingContext.ARRAY_BUFFER,
-            new Float32Array(vertexArray),
-            WebGL2RenderingContext.STATIC_DRAW
-          );
+    const indices = [
+      0, 1, 2,
+      2, 3, 0,
+    ];
 
-          gl.bindBuffer(WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER, this.buffer_index_vertices);
-          gl.bufferData(
-            WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER,
-            new Uint16Array(vertexArray),
-            WebGL2RenderingContext.STATIC_DRAW,
-          );
-
-          this.vertices = vertexArray.length / 3;
-          this.faces = vertexIndexArray.length;
-        }
+    gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, this.buffer_vertices);
+    gl.bufferData(
+      WebGL2RenderingContext.ARRAY_BUFFER,
+      new Float32Array(data),
+      WebGL2RenderingContext.STATIC_DRAW
     );
+
+    gl.bindBuffer(WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER, this.buffer_index_vertices);
+    gl.bufferData(
+      WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER,
+      new Uint16Array(indices),
+      WebGL2RenderingContext.STATIC_DRAW
+    )
+
+    this.vertices = data.length / 3;
+    this.faces = indices.length;
   }
 }
