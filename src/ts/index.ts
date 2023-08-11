@@ -8,6 +8,7 @@ import fragmentShader from "../shaders/fragmentShader.glsl";
 import { CubicBezierCurve } from "../modules/CubicBezierCurve";
 import { DrawableObject } from "./DrawableObject";
 import { F } from "./F";
+import { Pyramid } from "./Pyramid";
 
 var gl_handler : gl; 
 var spline : Spline;
@@ -68,7 +69,8 @@ async function main() {
   gl_handler.gl.viewport(0, 0, canva.width, canva.height);
 
   objects.push(
-    new F(gl_handler.gl),
+    // new F(gl_handler.gl),
+    new Pyramid(gl_handler.gl),
   );
 
   start = Date.now();
@@ -91,7 +93,6 @@ function canvasResize(canva:HTMLCanvasElement) {
 var full_rotation = 10000;
 var start = Date.now();
 var period_walk = 5000;
-
 
 const canva = document.getElementById("mainCanvas") as HTMLCanvasElement;
 // Create perspective matrix

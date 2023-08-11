@@ -41,7 +41,7 @@ const Spline_1 = require("../modules/Spline");
 const vertexShader_glsl_1 = __importDefault(require("../shaders/vertexShader.glsl"));
 const fragmentShader_glsl_1 = __importDefault(require("../shaders/fragmentShader.glsl"));
 const CubicBezierCurve_1 = require("../modules/CubicBezierCurve");
-const F_1 = require("./F");
+const Pyramid_1 = require("./Pyramid");
 var gl_handler;
 var spline;
 var objects = new Array();
@@ -73,7 +73,9 @@ function main() {
         gl_handler.gl.bufferData(WebGL2RenderingContext.ARRAY_BUFFER, new Float32Array(spline_points), WebGL2RenderingContext.STATIC_DRAW);
         gl_handler.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
         gl_handler.gl.viewport(0, 0, canva.width, canva.height);
-        objects.push(new F_1.F(gl_handler.gl));
+        objects.push(
+        // new F(gl_handler.gl),
+        new Pyramid_1.Pyramid(gl_handler.gl));
         start = Date.now();
         animateTiangle();
     });
