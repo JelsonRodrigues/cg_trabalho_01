@@ -83,9 +83,6 @@ async function main() {
 var begin_movement : glm.vec2 = glm.vec2.create();
 var moving_camera_with_mouse : boolean = false;
 
-var y_axis_transformed : glm.vec3;
-var x_axis_transformed : glm.vec3;
-
 function setupEventHandlers() {
   window.addEventListener('keydown', (event) => {
     switch (event.code) {
@@ -105,39 +102,16 @@ function setupEventHandlers() {
   });
 
   canva.addEventListener("pointerdown", (event) => {
-    console.log(`clicked ${event.clientX}, ${event.clientY}`);
     begin_movement[0] = event.clientX;
     begin_movement[1] = event.clientY;
     moving_camera_with_mouse = true;
 
-    const camera_origin_vec = glm.vec3.create();
-    glm.vec3.sub(camera_origin_vec, look_at, camera_position_in_world);
-    glm.vec3.normalize(camera_origin_vec, camera_origin_vec);
-
-    const up_normalized = glm.vec3.create();
-    glm.vec3.normalize(up_normalized, up_position);
-
-    const cross_up_camera = glm.vec3.create();
-    glm.vec3.cross(cross_up_camera, camera_origin_vec, up_normalized);
-
-    const up_new = glm.vec3.create();
-    glm.vec3.cross(up_new, cross_up_camera, camera_origin_vec);
-
-
-    y_axis_transformed = up_new;
-    x_axis_transformed = cross_up_camera;
-
-    console.log("x axis: ", x_axis_transformed);
-    console.log("y axis: ", y_axis_transformed);
-
-
-    canva.addEventListener("pointermove", func);
+    canva.addEventListener("pointermove", move_camera_with_mouse);
   });
 
   canva.addEventListener("pointerup", (event) => {
-    console.log(`left ${event}`);
     moving_camera_with_mouse = false;
-    canva.removeEventListener("pointermove", func);
+    canva.removeEventListener("pointermove", move_camera_with_mouse);
   });
 
   canva.addEventListener("wheel", (event) => {
@@ -156,17 +130,47 @@ function setupEventHandlers() {
     }
   });
 
-  const func = (event: PointerEvent) => {
-    // console.log(`${event.clientX}, ${event.clientY}`);
+  const move_camera_with_mouse = (event: PointerEvent) => {
     const current_position = glm.vec2.fromValues(event.clientX, event.clientY);
 
     const change = glm.vec2.create();
     glm.vec2.sub(change, current_position, begin_movement);
 
-    glm.vec3.rotateY(camera_position_in_world, camera_position_in_world, y_axis_transformed, change[0] * -0.01);
-    glm.vec3.rotateX(camera_position_in_world, camera_position_in_world, x_axis_transformed, change[1] * 0.01);
+    const camera_matrix = glm.mat4.create();
+    glm.mat4.targetTo(camera_matrix, camera_position_in_world, look_at, up_position);
+
+    const y_axis_transformed = glm.vec3.fromValues(camera_matrix[4], camera_matrix[5], camera_matrix[6]);
+    const x_axis_transformed = glm.vec3.fromValues(camera_matrix[0], camera_matrix[1], camera_matrix[2]);
+
+    const rotation_arround_y = create_rotation_matrix(y_axis_transformed, change[0] * -0.01);
+    const rotation_arround_x = create_rotation_matrix(x_axis_transformed, change[1] * -0.01);
+
+    glm.vec3.transformMat3(camera_position_in_world, camera_position_in_world, rotation_arround_y);
+    glm.vec3.transformMat3(camera_position_in_world, camera_position_in_world, rotation_arround_x);
 
     begin_movement = glm.vec2.clone(current_position);
+  }
+
+  // This matrix rotates arround an abitrary axis, I get this from the book 
+  // Mathematics for 3D Game Programming and Computer Graphics, Third Edition
+  const create_rotation_matrix = (axis : glm.vec3, angle : number) : glm.mat3 => {
+    const cos_angle = Math.cos(angle);
+    const sin_angle = Math.sin(angle);
+    const rotation = glm.mat3.create();
+
+    rotation[0] = cos_angle + (1-cos_angle) * (axis[0] * axis[0]);
+    rotation[1] = (1-cos_angle) * axis[0] * axis[1] + sin_angle * axis[2];
+    rotation[2] = (1-cos_angle) * axis[0] * axis[2] - sin_angle * axis[1];
+
+    rotation[3] = (1-cos_angle) * axis[0] * axis[1] - sin_angle * axis[2];
+    rotation[4] = cos_angle + (1-cos_angle) * (axis[1] * axis[1]);
+    rotation[5] = (1-cos_angle) * axis[1] * axis[2] + sin_angle * axis[0];
+
+    rotation[6] = (1-cos_angle) * axis[0] * axis[2] + sin_angle * axis[1];
+    rotation[7] = (1-cos_angle) * axis[1] * axis[2] - sin_angle * axis[0];
+    rotation[8] = cos_angle + (1-cos_angle) * (axis[2] * axis[2]);
+
+    return rotation;
   }
 }
 
