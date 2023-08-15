@@ -13,6 +13,7 @@ exports.WebGLUtils = exports.gl = void 0;
 class gl {
     constructor(canva, vsSource, fsSource) {
         this.gl = canva.getContext("webgl2");
+        this.gl.enable(this.gl.DEPTH_TEST);
         this.program = gl.createProgram(this.gl, gl.createShader(this.gl, WebGL2RenderingContext.VERTEX_SHADER, vsSource), gl.createShader(this.gl, WebGL2RenderingContext.FRAGMENT_SHADER, fsSource));
         this.a_position = this.gl.getAttribLocation(this.program, "position");
         this.a_uv_text_coord = this.gl.getAttribLocation(this.program, "a_uv_text_coord");

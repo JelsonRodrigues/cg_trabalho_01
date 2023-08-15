@@ -41,11 +41,14 @@ const Spline_1 = require("../modules/Spline");
 const vertexShader_glsl_1 = __importDefault(require("../shaders/vertexShader.glsl"));
 const fragmentShader_glsl_1 = __importDefault(require("../shaders/fragmentShader.glsl"));
 const CubicBezierCurve_1 = require("../modules/CubicBezierCurve");
-const Pyramid_1 = require("./Pyramid");
+const Camera_1 = require("./Camera");
 const Ground_1 = require("./Ground");
+const CameraCoordinates_1 = require("./CameraCoordinates");
 var gl_handler;
 var spline;
 var objects = new Array();
+var cameras = new Array();
+var current_camera = 0;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         // Try read a OBJ
@@ -58,6 +61,7 @@ function main() {
         spline.addCurve(curve2);
         spline.addCurve(curve3);
         spline.sampleSpline();
+        cameras.push(new Camera_1.Camera([15, 10, 0], [0, 0, 0], [0, 1, 0]), new Camera_1.Camera([15, 10, 0], [0, 0, 0], [0, 1, 0]));
         // Get canvas
         const canva = document.getElementById("mainCanvas");
         canvasResize(canva);
@@ -76,7 +80,8 @@ function main() {
         gl_handler.gl.viewport(0, 0, canva.width, canva.height);
         objects.push(
         // new F(gl_handler.gl),
-        new Pyramid_1.Pyramid(gl_handler.gl), new Ground_1.Ground(gl_handler.gl));
+        // new Pyramid(gl_handler.gl),
+        new Ground_1.Ground(gl_handler.gl), new CameraCoordinates_1.CameraCoordinates(gl_handler.gl));
         setupEventHandlers();
         start = Date.now();
         animateTiangle();
@@ -86,18 +91,28 @@ var begin_movement = glm.vec2.create();
 var moving_camera_with_mouse = false;
 function setupEventHandlers() {
     window.addEventListener('keydown', (event) => {
+        const camera = cameras[current_camera];
+        const look_at = camera.getCameraLookingAt();
         switch (event.code) {
             case "ArrowUp":
                 look_at[0] += 0.5;
+                camera.updateLookAt(look_at);
                 break;
             case "ArrowDown":
                 look_at[0] -= 0.5;
+                camera.updateLookAt(look_at);
                 break;
             case "ArrowRight":
                 look_at[2] += 0.5;
+                camera.updateLookAt(look_at);
                 break;
             case "ArrowLeft":
                 look_at[2] -= 0.5;
+                camera.updateLookAt(look_at);
+                break;
+            case "KeyV":
+                console.log("Changed Camera");
+                current_camera = (current_camera + 1) % cameras.length;
                 break;
         }
     });
@@ -112,6 +127,9 @@ function setupEventHandlers() {
         canva.removeEventListener("pointermove", move_camera_with_mouse);
     });
     canva.addEventListener("wheel", (event) => {
+        const camera = cameras[current_camera];
+        const camera_position_in_world = camera.getCameraPosition();
+        const look_at = camera.getCameraLookingAt();
         const origin_camera_vec = glm.vec3.create();
         glm.vec3.sub(origin_camera_vec, camera_position_in_world, look_at);
         const old_size = glm.vec3.len(origin_camera_vec);
@@ -123,20 +141,24 @@ function setupEventHandlers() {
         else if (event.deltaY < 0) {
             glm.vec3.scaleAndAdd(camera_position_in_world, look_at, normalized_vec, old_size - 1.00);
         }
+        camera.updateCameraPosition(camera_position_in_world);
     });
     const move_camera_with_mouse = (event) => {
+        const camera = cameras[current_camera];
+        const camera_position_in_world = camera.getCameraPosition();
+        const look_at = camera.getCameraLookingAt();
         const current_position = glm.vec2.fromValues(event.clientX, event.clientY);
         const change = glm.vec2.create();
         glm.vec2.sub(change, current_position, begin_movement);
-        const camera_matrix = glm.mat4.create();
-        glm.mat4.targetTo(camera_matrix, camera_position_in_world, look_at, up_position);
+        const camera_matrix = cameras[current_camera].getCameraMatrix();
         const y_axis_transformed = glm.vec3.fromValues(camera_matrix[4], camera_matrix[5], camera_matrix[6]);
-        const x_axis_transformed = glm.vec3.fromValues(camera_matrix[0], camera_matrix[1], camera_matrix[2]);
         const rotation_arround_y = create_rotation_matrix(y_axis_transformed, change[0] * -0.01);
-        const rotation_arround_x = create_rotation_matrix(x_axis_transformed, change[1] * -0.01);
         glm.vec3.transformMat3(camera_position_in_world, camera_position_in_world, rotation_arround_y);
+        const x_axis_transformed = glm.vec3.fromValues(camera_matrix[0], camera_matrix[1], camera_matrix[2]);
+        const rotation_arround_x = create_rotation_matrix(x_axis_transformed, change[1] * -0.01);
         glm.vec3.transformMat3(camera_position_in_world, camera_position_in_world, rotation_arround_x);
         begin_movement = glm.vec2.clone(current_position);
+        camera.updateCameraPosition(camera_position_in_world);
     };
     // This matrix rotates arround an abitrary axis, I get this from the book 
     // Mathematics for 3D Game Programming and Computer Graphics, Third Edition
@@ -156,6 +178,14 @@ function setupEventHandlers() {
         return rotation;
     };
 }
+function updateCameraPosition(t, spline, camera) {
+    const location_spline = spline.getPoint(t);
+    const looking_at_tangent = spline.getPointTangent(t);
+    glm.vec3.normalize(looking_at_tangent, looking_at_tangent);
+    glm.vec3.add(looking_at_tangent, looking_at_tangent, location_spline);
+    camera.updateCameraPosition(location_spline);
+    camera.updateLookAt(looking_at_tangent);
+}
 function canvasResize(canva) {
     const widht = window.innerWidth;
     const height = window.innerHeight - 50;
@@ -167,10 +197,6 @@ function canvasResize(canva) {
 var full_rotation = 10000;
 var start = Date.now();
 var period_walk = 5000;
-// Camera infos
-var camera_position_in_world = [15, 7.5, 0];
-var up_position = [0.0, 1.0, 0.0];
-var look_at = [0, 0, 0];
 const canva = document.getElementById("mainCanvas");
 // Create perspective matrix
 const field_of_view = Math.PI / 4.0;
@@ -183,41 +209,26 @@ function animateTiangle() {
     const now = Date.now();
     const percent_animation = ((now - start) / full_rotation) % 1.0;
     const angle = Math.PI * 2 * percent_animation;
-    // // Create model matrix
+    // Create model matrix
     const model = glm.mat4.create();
-    // const model = objects[0].model;
-    // glm.mat4.scale(model, model, [1.0/30.0, -1.0/30.0, 1.0/30.0]);
-    // glm.mat4.scale(model, model, [10, 0, 10]);
-    // glm.mat4.rotateY(model, model, angle);
-    // objects[0].model = model;
-    // glm.mat4.translate(model, model, [Math.sin(angle/2) * 300, 0.0, 0.0]);
-    // Create view matrix
-    const radius = 100.0;
-    // const camera_position_in_world : glm.vec3 = [Math.cos(angle) * radius, 50.0, Math.sin(angle) * radius ];
-    const location_spline = spline.getPoint(percent_animation);
-    const looking_at_tangent = spline.getPointTangent(percent_animation);
-    glm.vec3.normalize(looking_at_tangent, looking_at_tangent);
-    glm.vec3.add(looking_at_tangent, looking_at_tangent, location_spline);
-    // const camera_position_in_world : glm.vec3 = [location_spline[0], location_spline[1], location_spline[2]];
-    // const up_position : glm.vec3 = [0.0, 1.0, 0.0];
-    // const look_at : glm.vec3 = looking_at_tangent;
-    // const camera_position_in_world : glm.vec3 = [15, 7.5, 0];
-    // const up_position : glm.vec3 = [0.0, 1.0, 0.0];
-    // const look_at : glm.vec3 = glm.vec3.transformMat4(glm.vec3.create(), [0,0,0], model); // Look at the F
-    // const look_at : glm.vec3 = [0,0,0];
-    const camera = glm.mat4.create();
-    glm.mat4.lookAt(camera, camera_position_in_world, look_at, up_position);
-    // A funcao lookAt cria a camera a funcao targetTo cria a matriz da camera
-    // Uma e o inverso da outra, inverso(lookAt) == targetTo && lookAt == inverso(targetTo)
-    // Para fazer um objeto olhar para outro, usa-se a targetTo, para criar a camera, que possui
-    // a posicao do olho, up vector ... e depois a mudanca de base usa-se a lookAt
-    // Por algum motivo a inversa nao e igual a transposta, deveria. Mas pode ser que os vetores que 
-    // eu estou inserindo nao sao normalizados e/ou ortogonais??
-    // gl_handler.drawTriangle(model, camera, perspective);
+    let camera = cameras[current_camera];
+    if (current_camera == 1) {
+        updateCameraPosition(percent_animation, spline, camera);
+    }
+    const view_matrix = camera.getViewMatrix();
     gl_handler.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
     objects.forEach((drawable_obj) => {
         if (drawable_obj.draw !== undefined) {
-            drawable_obj.draw(gl_handler.gl, camera, perspective);
+            if (drawable_obj instanceof CameraCoordinates_1.CameraCoordinates) {
+                const x = glm.vec4.create();
+                const y = glm.vec4.create();
+                const z = glm.vec4.create();
+                glm.vec4.transformMat4(x, [1, 0, 0, 0], view_matrix);
+                glm.vec4.transformMat4(y, [0, 1, 0, 0], view_matrix);
+                glm.vec4.transformMat4(z, [0, 0, 1, 0], view_matrix);
+                drawable_obj.UpdatePoints(gl_handler.gl, [x[0], x[1], x[2]], [y[0], y[1], y[2]], [z[0], z[1], z[2]]);
+            }
+            drawable_obj.draw(gl_handler.gl, view_matrix, perspective);
         }
         else {
             console.log("DRAW E UNDEFINED");
@@ -226,7 +237,7 @@ function animateTiangle() {
     });
     /* Draw the Control points */
     glm.mat4.identity(model);
-    gl_handler.drawControlPoints(spline.array_points.length, model, camera, perspective);
+    gl_handler.drawControlPoints(spline.array_points.length, model, view_matrix, perspective);
     requestAnimationFrame(animateTiangle);
 }
 window.onload = main;

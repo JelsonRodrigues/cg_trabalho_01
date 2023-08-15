@@ -23,6 +23,7 @@ export class gl {
 
   constructor (canva : HTMLCanvasElement, vsSource : string, fsSource : string) {
     this.gl = canva.getContext("webgl2") as WebGL2RenderingContext;
+    this.gl.enable(this.gl.DEPTH_TEST);
     this.program = gl.createProgram(
       this.gl,
       gl.createShader(this.gl, WebGL2RenderingContext.VERTEX_SHADER, vsSource) as WebGLShader,
