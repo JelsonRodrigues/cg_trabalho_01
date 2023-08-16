@@ -25,6 +25,15 @@ export class Spline {
     return this.curves[curve_index].getPoint(new_t);
   }
 
+  public getVectorTangent(t:number) : glm.vec3 {
+    const sanitized_t = Math.abs(t) % 1.0;
+    const expand_t = sanitized_t * this.curves.length;
+    const curve_index = Math.floor(expand_t);
+    const new_t = expand_t - curve_index;
+    
+    return this.curves[curve_index].getVectorTangent(new_t);
+  }
+
   public getPointTangent(t:number) : glm.vec3 {
     const sanitized_t = Math.abs(t) % 1.0;
     const expand_t = sanitized_t * this.curves.length;

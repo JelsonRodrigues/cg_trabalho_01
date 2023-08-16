@@ -59,6 +59,13 @@ export class CubicBezierCurve {
   }
 
   public getPointTangent(t: number): glm.vec3 {
+    const point = this.getPoint(t);
+    const vec = this.getVectorTangent(t);
+    const res = glm.vec3.add(glm.vec3.create(), point, vec);
+    return res;
+  }
+
+  public getVectorTangent(t: number): glm.vec3 {
     const t_0 = 0;
     const t_1 = Math.pow(t, 0);
     const t_2 = Math.pow(t, 1);
