@@ -3,10 +3,10 @@ import * as glm from "gl-matrix";
 
 import { gl as glHelper, WebGLUtils} from "./gl";
 
-import vertexSource from "../shaders/vertexShader.glsl";
-import fragmentSource from "../shaders/fragmentShader.glsl";
+import vertexSource from "../shaders/virusVertexShader.glsl";
+import fragmentSource from "../shaders/virusFragmentShader.glsl";
 
-export class Pyramid extends DrawableObject {
+export class Virus extends DrawableObject {
   private vao : WebGLVertexArrayObject;
   private buffer_vertices : WebGLBuffer;
   private buffer_index_vertices : WebGLBuffer;
@@ -14,14 +14,16 @@ export class Pyramid extends DrawableObject {
   private u_view : WebGLUniformLocation;
   private u_projection : WebGLUniformLocation;
   private a_position : number;
+  private a_normal : number;
+  private a_text_coord : number;
   private vertices : number = 0;
   private faces : number = 0;
 
   constructor (gl : WebGL2RenderingContext) {
     super();
     this.model = glm.mat4.create();
-    glm.mat4.scale(this.model, this.model, [5, 8, 5]);
-    glm.mat4.rotate(this.model, this.model, -Math.PI / 2.0, [1.0, 0.0, 0.0]);
+    glm.mat4.scale(this.model, this.model, [1/15.0, 1/15.0, 1/15.0]);
+    glm.mat4.translate(this.model, this.model, [53, 75, 0]);
     
     // Create the program
     this.program = glHelper.createProgram(
@@ -37,6 +39,8 @@ export class Pyramid extends DrawableObject {
     this.u_projection = gl.getUniformLocation(this.program, "projection") as WebGLUniformLocation;
     
     this.a_position = gl.getAttribLocation(this.program, "position");
+    this.a_normal = gl.getAttribLocation(this.program, "normal");
+    this.a_text_coord = gl.getAttribLocation(this.program, "text_coord");
     
     // Create the vertices buffer
     this.buffer_vertices = gl.createBuffer() as WebGLBuffer;
@@ -56,10 +60,29 @@ export class Pyramid extends DrawableObject {
       3, 
       WebGL2RenderingContext.FLOAT, 
       false, 
-      3 * Float32Array.BYTES_PER_ELEMENT, 
+      8 * Float32Array.BYTES_PER_ELEMENT, 
       0 * Float32Array.BYTES_PER_ELEMENT
     );
     gl.enableVertexAttribArray(this.a_position);
+
+    gl.vertexAttribPointer(
+      this.a_normal,
+      3, 
+      WebGL2RenderingContext.FLOAT, 
+      false, 
+      8 * Float32Array.BYTES_PER_ELEMENT, 
+      3 * Float32Array.BYTES_PER_ELEMENT
+    );
+    gl.enableVertexAttribArray(this.a_normal);
+    gl.vertexAttribPointer(
+      this.a_text_coord,
+      2, 
+      WebGL2RenderingContext.FLOAT, 
+      false, 
+      8 * Float32Array.BYTES_PER_ELEMENT, 
+      6 * Float32Array.BYTES_PER_ELEMENT
+    );
+    gl.enableVertexAttribArray(this.a_text_coord);
 
     // Unbind VAO buffer so other objects cannot modify it
     gl.bindVertexArray(null);
@@ -89,16 +112,32 @@ export class Pyramid extends DrawableObject {
   } 
   
   override setup(gl: WebGL2RenderingContext): void {
-    const data = WebGLUtils.readObj("./objects/pyramid.obj").then(
+    const data = WebGLUtils.readObj("./objects/Virus/Coronavirus_Lowpoly.obj").then(
       ([vertexArray, vertexTextCoordArray, vertexNormalArray, 
         vertexIndexArray, vertexIndexTextCoordArray, vertexIndexNormalArray]) => {
+          const packed_data = new Float32Array(vertexArray.length * 8);
+          
+          for (let i = 0; i < vertexArray.length / 3; ++i) {
+            packed_data[8 * i + 0] = vertexArray[3 * i + 0];
+            packed_data[8 * i + 1] = vertexArray[3 * i + 1];
+            packed_data[8 * i + 2] = vertexArray[3 * i + 2];
+
+            packed_data[8 * i + 3] = vertexNormalArray[3 * i + 0];
+            packed_data[8 * i + 4] = vertexNormalArray[3 * i + 1];
+            packed_data[8 * i + 5] = vertexNormalArray[3 * i + 2];
+
+            packed_data[8 * i + 6] = 0;
+            packed_data[8 * i + 7] = 0;
+          }
+
           console.log("Vertex Array ", vertexArray);
+          console.log("Vertex TextCoord Array ", vertexTextCoordArray);
           console.log("Vertex Index Array ", vertexIndexArray);
 
           gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, this.buffer_vertices);
           gl.bufferData(
             WebGL2RenderingContext.ARRAY_BUFFER,
-            new Float32Array(vertexArray),
+            packed_data,
             WebGL2RenderingContext.STATIC_DRAW
           );
 

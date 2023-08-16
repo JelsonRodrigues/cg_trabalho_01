@@ -12,6 +12,7 @@ import { F } from "./F";
 import { Pyramid } from "./Pyramid";
 import { Ground } from "./Ground";
 import { CameraCoordinates } from "./CameraCoordinates";
+import { Virus } from "./Virus";
 
 var gl_handler : gl; 
 var spline : Spline;
@@ -79,10 +80,11 @@ async function main() {
   gl_handler.gl.viewport(0, 0, canva.width, canva.height);
 
   objects.push(
-    // new F(gl_handler.gl),
-    // new Pyramid(gl_handler.gl),
+    new F(gl_handler.gl),
+    new Pyramid(gl_handler.gl),
     new Ground(gl_handler.gl),
     new CameraCoordinates(gl_handler.gl),
+    new Virus(gl_handler.gl),
   );
 
   setupEventHandlers();
@@ -247,6 +249,9 @@ function animateTiangle() {
   if (current_camera == 1) {
     updateCameraPosition(percent_animation, spline, camera);
   }
+  // else {
+  //   camera.updateLookAt(glm.vec3.transformMat4(glm.vec3.create(), [0, 0, 0], objects[1].model));
+  // }
   const view_matrix = camera.getViewMatrix();
 
   gl_handler.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
@@ -266,6 +271,20 @@ function animateTiangle() {
           [y[0], y[1], y[2]],
           [z[0], z[1], z[2]],
           );
+      }
+      if (drawable_obj instanceof Virus) {
+        // Draw 3
+        const model = drawable_obj.model;
+        const model_copy = glm.mat4.clone(drawable_obj.model);
+        const rest_position = glm.vec3.fromValues(model[12], model[13], model[14]);
+        for (let i = 0; i < 3; ++i) {
+          glm.mat4.translate(model, model, [50, 15, 0]);
+          glm.mat4.rotateY(model, model, angle);
+
+          drawable_obj.draw(gl_handler.gl, view_matrix, perspective);
+        }
+        glm.mat4.rotateZ(model_copy, model_copy, angle*0.01);
+        drawable_obj.model = model_copy;
       }
       drawable_obj.draw(gl_handler.gl, view_matrix, perspective);
     }

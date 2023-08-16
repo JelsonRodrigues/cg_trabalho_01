@@ -18,6 +18,9 @@ export class F extends DrawableObject {
   constructor (gl : WebGL2RenderingContext) {
     super();
     this.model = glm.mat4.create();
+    glm.mat4.scale(this.model, this.model, [1.0/30.0, -1.0/30.0, 1.0/30.0]);
+    glm.mat4.translate(this.model, this.model, [-100, -150, -130]);
+    glm.mat4.rotate(this.model, this.model, Math.PI / 12.0, [0.0, 1.0, 0.0]);
     
     // Create the program
     this.program = glHelper.createProgram(

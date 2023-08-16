@@ -42,8 +42,11 @@ const vertexShader_glsl_1 = __importDefault(require("../shaders/vertexShader.gls
 const fragmentShader_glsl_1 = __importDefault(require("../shaders/fragmentShader.glsl"));
 const CubicBezierCurve_1 = require("../modules/CubicBezierCurve");
 const Camera_1 = require("./Camera");
+const F_1 = require("./F");
+const Pyramid_1 = require("./Pyramid");
 const Ground_1 = require("./Ground");
 const CameraCoordinates_1 = require("./CameraCoordinates");
+const Virus_1 = require("./Virus");
 var gl_handler;
 var spline;
 var objects = new Array();
@@ -78,10 +81,7 @@ function main() {
         gl_handler.gl.bufferData(WebGL2RenderingContext.ARRAY_BUFFER, new Float32Array(spline_points), WebGL2RenderingContext.STATIC_DRAW);
         gl_handler.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
         gl_handler.gl.viewport(0, 0, canva.width, canva.height);
-        objects.push(
-        // new F(gl_handler.gl),
-        // new Pyramid(gl_handler.gl),
-        new Ground_1.Ground(gl_handler.gl), new CameraCoordinates_1.CameraCoordinates(gl_handler.gl));
+        objects.push(new F_1.F(gl_handler.gl), new Pyramid_1.Pyramid(gl_handler.gl), new Ground_1.Ground(gl_handler.gl), new CameraCoordinates_1.CameraCoordinates(gl_handler.gl), new Virus_1.Virus(gl_handler.gl));
         setupEventHandlers();
         start = Date.now();
         animateTiangle();
@@ -215,6 +215,9 @@ function animateTiangle() {
     if (current_camera == 1) {
         updateCameraPosition(percent_animation, spline, camera);
     }
+    // else {
+    //   camera.updateLookAt(glm.vec3.transformMat4(glm.vec3.create(), [0, 0, 0], objects[1].model));
+    // }
     const view_matrix = camera.getViewMatrix();
     gl_handler.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
     objects.forEach((drawable_obj) => {
@@ -227,6 +230,19 @@ function animateTiangle() {
                 glm.vec4.transformMat4(y, [0, 1, 0, 0], view_matrix);
                 glm.vec4.transformMat4(z, [0, 0, 1, 0], view_matrix);
                 drawable_obj.UpdatePoints(gl_handler.gl, [x[0], x[1], x[2]], [y[0], y[1], y[2]], [z[0], z[1], z[2]]);
+            }
+            if (drawable_obj instanceof Virus_1.Virus) {
+                // Draw 3
+                const model = drawable_obj.model;
+                const model_copy = glm.mat4.clone(drawable_obj.model);
+                const rest_position = glm.vec3.fromValues(model[12], model[13], model[14]);
+                for (let i = 0; i < 3; ++i) {
+                    glm.mat4.translate(model, model, [50, 15, 0]);
+                    glm.mat4.rotateY(model, model, angle);
+                    drawable_obj.draw(gl_handler.gl, view_matrix, perspective);
+                }
+                glm.mat4.rotateZ(model_copy, model_copy, angle * 0.01);
+                drawable_obj.model = model_copy;
             }
             drawable_obj.draw(gl_handler.gl, view_matrix, perspective);
         }
