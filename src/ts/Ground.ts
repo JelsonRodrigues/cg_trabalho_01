@@ -20,7 +20,7 @@ export class Ground extends DrawableObject {
   constructor (gl : WebGL2RenderingContext) {
     super();
     this.model = glm.mat4.create();
-    glm.mat4.scale(this.model, this.model, [50, 0, 20]);
+    glm.mat4.scale(this.model, this.model, [50, 0, 50]);
     
     // Create the program
     this.program = glHelper.createProgram(
