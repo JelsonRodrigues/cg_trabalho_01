@@ -13,6 +13,7 @@ import { Pyramid } from "./Pyramid";
 import { Ground } from "./Ground";
 import { CameraCoordinates } from "./CameraCoordinates";
 import { Virus } from "./Virus";
+import { GlowKnife } from "./GlowKnife";
 
 var gl_handler : gl; 
 var spline : Spline;
@@ -85,6 +86,7 @@ async function main() {
     new Ground(gl_handler.gl),
     new CameraCoordinates(gl_handler.gl),
     new Virus(gl_handler.gl),
+    new GlowKnife(gl_handler.gl),
   );
 
   setupEventHandlers();

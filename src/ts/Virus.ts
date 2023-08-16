@@ -130,10 +130,6 @@ export class Virus extends DrawableObject {
             packed_data[8 * i + 7] = 0;
           }
 
-          console.log("Vertex Array ", vertexArray);
-          console.log("Vertex TextCoord Array ", vertexTextCoordArray);
-          console.log("Vertex Index Array ", vertexIndexArray);
-
           gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, this.buffer_vertices);
           gl.bufferData(
             WebGL2RenderingContext.ARRAY_BUFFER,

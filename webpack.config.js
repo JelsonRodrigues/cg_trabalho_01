@@ -13,7 +13,7 @@ const path = require('path');
     rules: [{
         test: /\.glsl$/,
         loader: 'webpack-glsl-loader'
-      }
+      },
     ]
    },
  };

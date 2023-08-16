@@ -47,6 +47,7 @@ const Pyramid_1 = require("./Pyramid");
 const Ground_1 = require("./Ground");
 const CameraCoordinates_1 = require("./CameraCoordinates");
 const Virus_1 = require("./Virus");
+const GlowKnife_1 = require("./GlowKnife");
 var gl_handler;
 var spline;
 var objects = new Array();
@@ -81,7 +82,7 @@ function main() {
         gl_handler.gl.bufferData(WebGL2RenderingContext.ARRAY_BUFFER, new Float32Array(spline_points), WebGL2RenderingContext.STATIC_DRAW);
         gl_handler.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
         gl_handler.gl.viewport(0, 0, canva.width, canva.height);
-        objects.push(new F_1.F(gl_handler.gl), new Pyramid_1.Pyramid(gl_handler.gl), new Ground_1.Ground(gl_handler.gl), new CameraCoordinates_1.CameraCoordinates(gl_handler.gl), new Virus_1.Virus(gl_handler.gl));
+        objects.push(new F_1.F(gl_handler.gl), new Pyramid_1.Pyramid(gl_handler.gl), new Ground_1.Ground(gl_handler.gl), new CameraCoordinates_1.CameraCoordinates(gl_handler.gl), new Virus_1.Virus(gl_handler.gl), new GlowKnife_1.GlowKnife(gl_handler.gl));
         setupEventHandlers();
         start = Date.now();
         animateTiangle();
