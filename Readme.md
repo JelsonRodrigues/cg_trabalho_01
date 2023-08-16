@@ -14,12 +14,13 @@ npx webpack
 - [x] Create folders skeleton
 - [x] Create matrix handling functions
 - [x] Create vector handling functions
-- [ ] Create spline functions
-- [ ] Create html skeleton
+- [X] Create spline functions
+- [X] Create turn G0, G1, G2 functions
+- [X] Create html skeleton
     - [x] Create canvas
-    - [ ] Create button to animate
+    - [X] Create button to animate
 - [x] Create the projection matrix
-- [ ] Read a WebGL Texture (How?)
+- [X] Read a WebGL Texture (How?)
 - [ ] Create the world
     - [ ] Define what scene will look like
     - [ ] Define what is the camera path
