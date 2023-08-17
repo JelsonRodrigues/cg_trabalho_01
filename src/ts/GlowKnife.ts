@@ -1,7 +1,6 @@
 import { DrawableObject} from "./DrawableObject";
 import * as glm from "gl-matrix";
-
-import { gl as glHelper, WebGLUtils} from "./gl";
+import { WebGLUtils } from "./WebGLUtils";
 
 import vertexSource from "../shaders/knifeVertexShader.glsl";
 import fragmentSource from "../shaders/knifeFragmentShader.glsl";
@@ -58,10 +57,10 @@ export class GlowKnife implements DrawableObject {
   
   setup(gl: WebGL2RenderingContext): void {
     // Create the program
-    GlowKnife.program = glHelper.createProgram(
+    GlowKnife.program = WebGLUtils.createProgram(
       gl,
-      glHelper.createShader(gl, WebGL2RenderingContext.VERTEX_SHADER, vertexSource) as WebGLShader,
-      glHelper.createShader(gl, WebGL2RenderingContext.FRAGMENT_SHADER, fragmentSource) as WebGLShader
+      WebGLUtils.createShader(gl, WebGL2RenderingContext.VERTEX_SHADER, vertexSource) as WebGLShader,
+      WebGLUtils.createShader(gl, WebGL2RenderingContext.FRAGMENT_SHADER, fragmentSource) as WebGLShader
     ) as WebGLProgram;
     gl.useProgram(GlowKnife.program);
     

@@ -1,10 +1,6 @@
 import * as glm from "gl-matrix";
-import { gl, WebGLUtils } from "./gl";
 
 import { Spline } from "../modules/Spline";
-
-import vertexShader from "../shaders/vertexShader.glsl";
-import fragmentShader from "../shaders/fragmentShader.glsl";
 import { CubicBezierCurve } from "../modules/CubicBezierCurve";
 import { DrawableObject } from "./DrawableObject";
 import { Camera } from "./Camera";
@@ -15,17 +11,50 @@ import { CameraCoordinates } from "./CameraCoordinates";
 import { Virus } from "./Virus";
 import { GlowKnife } from "./GlowKnife";
 import { MovingCamera } from "./MovingCamera";
+import { SplinePoints } from "./SplinePath";
 
-var gl_handler : gl; 
+var canva : HTMLCanvasElement;
+var gl : WebGL2RenderingContext;
+
 var spline : Spline;
 var objects : Array<DrawableObject> = new Array();
 var cameras : Array<Camera> = new Array();
 var current_camera : number = 0;
 
+// Animation
+var full_rotation = 10000;
+var start = Date.now();
+
+var perspective = glm.mat4.create();
+
+function canvasResize(canva:HTMLCanvasElement) {
+  const widht = window.innerWidth;
+  const height = window.innerHeight - 50;
+  canva.width = widht;
+  canva.height = height;
+  canva.style.width = `${widht}px`;
+  canva.style.height = `${height}px`;
+}
+
 async function main() {
-  // Try read a OBJ
-  const obj_data = WebGLUtils.readObj("./objects/pyramid.obj");
+  // Get canvas
+  canva = document.getElementById("mainCanvas") as HTMLCanvasElement;
+  canvasResize(canva);
   
+  // Setup gl
+  gl = canva.getContext("webgl2") as WebGL2RenderingContext;
+  gl.enable(gl.DEPTH_TEST);
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT)
+  gl.viewport(0, 0, canva.width, canva.height)
+
+  // Create the perspective matrix
+  const field_of_view = Math.PI / 4.0;
+  const near = 0.01;
+  const far = 1000;
+  const aspect_ratio = canva.width / canva.height;
+  glm.mat4.perspective(perspective, field_of_view, aspect_ratio, near, far);
+
   spline = new Spline(30);
   const curve = new CubicBezierCurve(
     [-10.0, 10.0, -10.0],
@@ -48,46 +77,20 @@ async function main() {
   spline.addCurve(curve);
   spline.addCurve(curve2);
   spline.addCurve(curve3);
-  spline.sampleSpline();
 
   cameras.push(
     new Camera([15, 10, 0], [0, 0, 0], [0, 1, 0]),
     new MovingCamera([0, 1, 0], spline, 15000),
-    );
-
-  // Get canvas
-  const canva = document.getElementById("mainCanvas") as HTMLCanvasElement;
-  canvasResize(canva);
-
-  const vsSource = vertexShader;
-  const fsSource = fragmentShader;
-  gl_handler = new gl(canva, vsSource, fsSource);  
-
-  const spline_points = new Array();
-  spline.array_points.forEach((vec) => {
-    spline_points.push(vec[0]);
-    spline_points.push(vec[1]);
-    spline_points.push(vec[2]);
-  });
-
-  gl_handler.gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, gl_handler.buffer_control_points);
-  gl_handler.gl.bufferData(
-    WebGL2RenderingContext.ARRAY_BUFFER, 
-    new Float32Array(spline_points), 
-    WebGL2RenderingContext.STATIC_DRAW
   );
 
-  gl_handler.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
-
-  gl_handler.gl.viewport(0, 0, canva.width, canva.height);
-
   objects.push(
-    new F(gl_handler.gl),
-    new Pyramid(gl_handler.gl),
-    new Ground(gl_handler.gl),
-    new CameraCoordinates(gl_handler.gl),
-    new Virus(gl_handler.gl),
-    new GlowKnife(gl_handler.gl),
+    new F(gl),
+    new Pyramid(gl),
+    new Ground(gl),
+    new CameraCoordinates(gl),
+    new Virus(gl),
+    new GlowKnife(gl),
+    new SplinePoints(gl, spline),
   );
 
   setupEventHandlers();
@@ -96,7 +99,6 @@ async function main() {
 }
 
 var begin_movement : glm.vec2 = glm.vec2.create();
-var moving_camera_with_mouse : boolean = false;
 
 function setupEventHandlers() {
   window.addEventListener('keydown', (event) => {
@@ -129,13 +131,11 @@ function setupEventHandlers() {
   canva.addEventListener("pointerdown", (event) => {
     begin_movement[0] = event.clientX;
     begin_movement[1] = event.clientY;
-    moving_camera_with_mouse = true;
 
     canva.addEventListener("pointermove", move_camera_with_mouse);
   });
 
   canva.addEventListener("pointerup", (event) => {
-    moving_camera_with_mouse = false;
     canva.removeEventListener("pointermove", move_camera_with_mouse);
   });
 
@@ -207,36 +207,6 @@ function setupEventHandlers() {
   }
 }
 
-function updateCameraPosition(t:number, spline:Spline, camera:Camera) {
-  const location_spline = spline.getPoint(t);
-  const looking_at_tangent = spline.getPointTangent(t);
-  
-  camera.updateCameraPosition(location_spline);
-  camera.updateLookAt(looking_at_tangent);
-}
-
-function canvasResize(canva:HTMLCanvasElement) {
-  const widht = window.innerWidth;
-  const height = window.innerHeight - 50;
-  canva.width = widht;
-  canva.height = height;
-  canva.style.width = `${widht}px`;
-  canva.style.height = `${height}px`;
-}
-
-var full_rotation = 10000;
-var start = Date.now();
-var period_walk = 5000;
-
-const canva = document.getElementById("mainCanvas") as HTMLCanvasElement;
-// Create perspective matrix
-const field_of_view = Math.PI / 4.0;
-const near = 0.01;
-const far = 1000;
-const aspect_ratio = canva.width / canva.height;
-const perspective = glm.mat4.create();
-glm.mat4.perspective(perspective, field_of_view, aspect_ratio, near, far);
-
 var before:number = 0;
 function animateTiangle() {
   const now = Date.now();
@@ -255,7 +225,7 @@ function animateTiangle() {
 
   const view_matrix = camera.getViewMatrix();
 
-  gl_handler.gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
+  gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
   objects.forEach((drawable_obj) => {
     if (drawable_obj.draw !== undefined) {
       if (drawable_obj instanceof CameraCoordinates) {
@@ -273,12 +243,12 @@ function animateTiangle() {
         glm.vec3.transformMat3(y, [0, 1, 0], view_without_translation);
         glm.vec3.transformMat3(z, [0, 0, 1], view_without_translation);
 
-        drawable_obj.UpdatePoints(gl_handler.gl, 
+        drawable_obj.UpdatePoints(gl, 
           [x[0], x[1], x[2]],
           [y[0], y[1], y[2]],
           [z[0], z[1], z[2]],
           );
-          drawable_obj.draw(gl_handler.gl, view_matrix, perspective);
+          drawable_obj.draw(gl, view_matrix, perspective);
       }
       else if (drawable_obj instanceof Virus) {
         const model_copy = glm.mat4.clone(drawable_obj.model);
@@ -288,7 +258,7 @@ function animateTiangle() {
         glm.mat4.rotateZ(rotation, rotation, angle)
         glm.mat4.multiply(model_copy, model_copy, rotation);
         drawable_obj.model = model_copy;
-        drawable_obj.draw(gl_handler.gl, view_matrix, perspective);
+        drawable_obj.draw(gl, view_matrix, perspective);
 
         for (let i = 0; i < 3; ++i) {
           const model = glm.mat4.clone(drawable_obj.model);
@@ -298,19 +268,19 @@ function animateTiangle() {
           glm.mat4.multiply(model, model, rotation);
 
           drawable_obj.model = model;
-          drawable_obj.draw(gl_handler.gl, view_matrix, perspective);
+          drawable_obj.draw(gl, view_matrix, perspective);
         }
         
         // Undo any modification
         drawable_obj.model = model_copy_original;
-        glm.mat4.translate(drawable_obj.model, drawable_obj.model, [Math.cos(angle) * 2, Math.sin(angle), 0]);
+        glm.mat4.translate(drawable_obj.model, drawable_obj.model, [Math.cos(angle), Math.sin(angle)/4.0, 0]);
       }
       else if (drawable_obj instanceof F){
         const model = glm.mat4.clone(drawable_obj.model);
         const rotation = glm.mat4.create();
         glm.mat4.rotateY(rotation, rotation, angle * 2);
         glm.mat4.multiply(drawable_obj.model, drawable_obj.model, rotation);
-        drawable_obj.draw(gl_handler.gl, view_matrix, perspective);
+        drawable_obj.draw(gl, view_matrix, perspective);
         drawable_obj.model = glm.mat4.clone(model);
       }
       else if (drawable_obj instanceof GlowKnife) {
@@ -318,7 +288,7 @@ function animateTiangle() {
 
         drawable_obj.model[12] += Math.sin(angle) * 6;
         drawable_obj.model[14] += Math.sin(-angle) * 6;
-        drawable_obj.draw(gl_handler.gl, view_matrix, perspective);
+        drawable_obj.draw(gl, view_matrix, perspective);
 
         drawable_obj.model = model;
       }
@@ -339,7 +309,7 @@ function animateTiangle() {
       //   drawable_obj.model = glm.mat4.clone(model);
       // }
       else {
-        drawable_obj.draw(gl_handler.gl, view_matrix, perspective);
+        drawable_obj.draw(gl, view_matrix, perspective);
       }
     }
     else {
@@ -348,10 +318,6 @@ function animateTiangle() {
     }
   });
   
-  /* Draw the Control points */
-  glm.mat4.identity(model);
-  gl_handler.drawControlPoints(spline.array_points.length, model, view_matrix, perspective);
-
   requestAnimationFrame(animateTiangle);
   before = now;
 }

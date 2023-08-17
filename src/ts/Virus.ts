@@ -1,7 +1,7 @@
 import { DrawableObject} from "./DrawableObject";
 import * as glm from "gl-matrix";
 
-import { gl as glHelper, WebGLUtils} from "./gl";
+import { WebGLUtils } from "./WebGLUtils";
 
 import vertexSource from "../shaders/virusVertexShader.glsl";
 import fragmentSource from "../shaders/virusFragmentShader.glsl";
@@ -61,10 +61,10 @@ export class Virus implements DrawableObject {
   
   setup(gl: WebGL2RenderingContext): void {
     // Create the program
-    Virus.program = glHelper.createProgram(
+    Virus.program = WebGLUtils.createProgram(
       gl,
-      glHelper.createShader(gl, WebGL2RenderingContext.VERTEX_SHADER, vertexSource) as WebGLShader,
-      glHelper.createShader(gl, WebGL2RenderingContext.FRAGMENT_SHADER, fragmentSource) as WebGLShader
+      WebGLUtils.createShader(gl, WebGL2RenderingContext.VERTEX_SHADER, vertexSource) as WebGLShader,
+      WebGLUtils.createShader(gl, WebGL2RenderingContext.FRAGMENT_SHADER, fragmentSource) as WebGLShader
     ) as WebGLProgram;
     gl.useProgram(Virus.program);
     

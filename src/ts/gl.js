@@ -173,7 +173,20 @@ class gl {
         this.gl.uniformMatrix4fv(this.u_projection, false, projection);
         // this.gl.drawElements(WebGL2RenderingContext.TRIANGLES, 6*3, 0, );
     }
-    static createShader(gl, type, source) {
+}
+exports.gl = gl;
+var WebGLUtils;
+(function (WebGLUtils) {
+    WebGLUtils.sleep = (ms = 0.0) => new Promise(r => setTimeout(r, ms));
+    function readFile(filePath) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield fetch(filePath);
+            const text = yield response.text();
+            return text;
+        });
+    }
+    WebGLUtils.readFile = readFile;
+    function createShader(gl, type, source) {
         const shader = gl.createShader(type);
         if (shader) {
             gl.shaderSource(shader, source);
@@ -187,7 +200,8 @@ class gl {
         }
         return null;
     }
-    static createProgram(gl, vertexShader, fragmentShader) {
+    WebGLUtils.createShader = createShader;
+    function createProgram(gl, vertexShader, fragmentShader) {
         const program = gl.createProgram();
         if (program) {
             gl.attachShader(program, vertexShader);
@@ -202,19 +216,7 @@ class gl {
         }
         return null;
     }
-}
-exports.gl = gl;
-var WebGLUtils;
-(function (WebGLUtils) {
-    WebGLUtils.sleep = (ms = 0.0) => new Promise(r => setTimeout(r, ms));
-    function readFile(filePath) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield fetch(filePath);
-            const text = yield response.text();
-            return text;
-        });
-    }
-    WebGLUtils.readFile = readFile;
+    WebGLUtils.createProgram = createProgram;
     /** @todo Read file in small chunks, preferable using something like 64 or 256 lines at time */
     function readObj(filePath) {
         return __awaiter(this, void 0, void 0, function* () {

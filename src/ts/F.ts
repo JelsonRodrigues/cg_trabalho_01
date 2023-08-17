@@ -1,7 +1,7 @@
 import { DrawableObject} from "./DrawableObject";
 import * as glm from "gl-matrix";
 
-import { gl as glHelper } from "./gl";
+import { WebGLUtils } from "./WebGLUtils";
 
 import vertexSource from "../shaders/vertexShader.glsl";
 import fragmentSource from "../shaders/fragmentShader.glsl";
@@ -56,10 +56,10 @@ export class F implements DrawableObject {
   
   setup(gl: WebGL2RenderingContext): void {
     // Create the program
-    F.program = glHelper.createProgram(
+    F.program = WebGLUtils.createProgram(
       gl,
-      glHelper.createShader(gl, WebGL2RenderingContext.VERTEX_SHADER, vertexSource) as WebGLShader,
-      glHelper.createShader(gl, WebGL2RenderingContext.FRAGMENT_SHADER, fragmentSource) as WebGLShader
+      WebGLUtils.createShader(gl, WebGL2RenderingContext.VERTEX_SHADER, vertexSource) as WebGLShader,
+      WebGLUtils.createShader(gl, WebGL2RenderingContext.FRAGMENT_SHADER, fragmentSource) as WebGLShader
     ) as WebGLProgram;
     gl.useProgram(F.program);
     
