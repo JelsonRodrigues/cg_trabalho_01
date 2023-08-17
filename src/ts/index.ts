@@ -83,12 +83,24 @@ async function main() {
     new MovingCamera([0, 1, 0], spline, 15000),
   );
 
+  const v1 = new Virus(gl);
+  const v2 = new Virus(gl);
+  const v3 = new Virus(gl);
+  const v4 = new Virus(gl);
+
+  glm.mat4.translate(v2.model, v1.model, [ 50, 15, 3 ]);
+  glm.mat4.translate(v3.model, v2.model, [ 50, 15, 3 ]);
+  glm.mat4.translate(v4.model, v3.model, [ 50, 15, 3 ]);
+
   objects.push(
     new F(gl),
     new Pyramid(gl),
     new Ground(gl),
     new CameraCoordinates(gl),
-    new Virus(gl),
+    v1,
+    v2,
+    v3,
+    v4,
     new GlowKnife(gl),
     new SplinePoints(gl, spline),
   );
@@ -273,29 +285,30 @@ function animateTiangle() {
           drawable_obj.draw(gl, view_matrix, perspective);
       }
       else if (drawable_obj instanceof Virus) {
-        const model_copy = glm.mat4.clone(drawable_obj.model);
-        const model_copy_original = glm.mat4.clone(drawable_obj.model);
-
-        const rotation = glm.mat4.create();
-        glm.mat4.rotateZ(rotation, rotation, angle)
-        glm.mat4.multiply(model_copy, model_copy, rotation);
-        drawable_obj.model = model_copy;
         drawable_obj.draw(gl, view_matrix, perspective);
+        // const model_copy = glm.mat4.clone(drawable_obj.model);
+        // const model_copy_original = glm.mat4.clone(drawable_obj.model);
 
-        for (let i = 0; i < 3; ++i) {
-          const model = glm.mat4.clone(drawable_obj.model);
-          glm.mat4.translate(model, model, [50, 15, 0]);
-          const rotation = glm.mat4.create();
-          glm.mat4.rotateY(rotation, rotation, angle + Math.PI / (i+1));
-          glm.mat4.multiply(model, model, rotation);
+        // const rotation = glm.mat4.create();
+        // glm.mat4.rotateZ(rotation, rotation, angle)
+        // glm.mat4.multiply(model_copy, model_copy, rotation);
+        // drawable_obj.model = model_copy;
+        // drawable_obj.draw(gl, view_matrix, perspective);
 
-          drawable_obj.model = model;
-          drawable_obj.draw(gl, view_matrix, perspective);
-        }
+        // for (let i = 0; i < 3; ++i) {
+        //   const model = glm.mat4.clone(drawable_obj.model);
+        //   glm.mat4.translate(model, model, [50, 15, 0]);
+        //   const rotation = glm.mat4.create();
+        //   glm.mat4.rotateY(rotation, rotation, angle + Math.PI / (i+1));
+        //   glm.mat4.multiply(model, model, rotation);
+
+        //   drawable_obj.model = model;
+        //   drawable_obj.draw(gl, view_matrix, perspective);
+        // }
         
-        // Undo any modification
-        drawable_obj.model = model_copy_original;
-        glm.mat4.translate(drawable_obj.model, drawable_obj.model, [Math.cos(angle), Math.sin(angle)/4.0, 0]);
+        // // Undo any modification
+        // drawable_obj.model = model_copy_original;
+        // glm.mat4.translate(drawable_obj.model, drawable_obj.model, [Math.cos(angle), Math.sin(angle)/4.0, 0]);
       }
       else if (drawable_obj instanceof F){
         const model = glm.mat4.clone(drawable_obj.model);
