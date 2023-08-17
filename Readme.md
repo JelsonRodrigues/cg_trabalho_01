@@ -7,7 +7,7 @@ cd cg_trabalho_01
 npm install
 tsc
 npx webpack
-// Start server
+node src/server/server.js
 ```
 
 # Todo!
