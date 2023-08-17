@@ -124,10 +124,20 @@ function setupEventHandlers() {
     canva.addEventListener("pointerdown", (event) => {
         begin_movement[0] = event.clientX;
         begin_movement[1] = event.clientY;
-        canva.addEventListener("pointermove", move_camera_with_mouse);
+        if (event.button == 0) {
+            canva.addEventListener("pointermove", orbit_camera_with_mouse);
+        }
+        else if (event.button == 2) {
+            canva.addEventListener("pointermove", move_camera_with_mouse);
+        }
     });
     canva.addEventListener("pointerup", (event) => {
-        canva.removeEventListener("pointermove", move_camera_with_mouse);
+        if (event.button == 0) {
+            canva.removeEventListener("pointermove", orbit_camera_with_mouse);
+        }
+        else if (event.button == 2) {
+            canva.removeEventListener("pointermove", move_camera_with_mouse);
+        }
     });
     canva.addEventListener("wheel", (event) => {
         const camera = cameras[current_camera];
@@ -146,39 +156,49 @@ function setupEventHandlers() {
         }
         camera.updateCameraPosition(camera_position_in_world);
     });
-    const move_camera_with_mouse = (event) => {
+    const orbit_camera_with_mouse = (event) => {
         const camera = cameras[current_camera];
         const camera_position_in_world = camera.getCameraPosition();
-        const look_at = camera.getCameraLookingAt();
+        const look_at_point = camera.getCameraLookingAt();
+        const look_at_to_camera_position_vec = glm.vec3.create();
+        glm.vec3.sub(look_at_to_camera_position_vec, camera_position_in_world, look_at_point);
         const current_position = glm.vec2.fromValues(event.clientX, event.clientY);
         const change = glm.vec2.create();
         glm.vec2.sub(change, current_position, begin_movement);
         const camera_matrix = cameras[current_camera].getCameraMatrix();
         const y_axis_transformed = glm.vec3.fromValues(camera_matrix[4], camera_matrix[5], camera_matrix[6]);
-        const rotation_arround_y = create_rotation_matrix(y_axis_transformed, change[0] * -0.01);
-        glm.vec3.transformMat3(camera_position_in_world, camera_position_in_world, rotation_arround_y);
+        const rotation_arround_y = glm.mat4.create();
+        glm.mat4.rotate(rotation_arround_y, rotation_arround_y, change[0] * -0.01, y_axis_transformed);
+        glm.vec3.transformMat4(look_at_to_camera_position_vec, look_at_to_camera_position_vec, rotation_arround_y);
         const x_axis_transformed = glm.vec3.fromValues(camera_matrix[0], camera_matrix[1], camera_matrix[2]);
-        const rotation_arround_x = create_rotation_matrix(x_axis_transformed, change[1] * -0.01);
-        glm.vec3.transformMat3(camera_position_in_world, camera_position_in_world, rotation_arround_x);
+        const rotation_arround_x = glm.mat4.create();
+        glm.mat4.rotate(rotation_arround_x, rotation_arround_x, change[1] * -0.01, x_axis_transformed);
+        glm.vec3.transformMat4(look_at_to_camera_position_vec, look_at_to_camera_position_vec, rotation_arround_x);
         begin_movement = glm.vec2.clone(current_position);
+        glm.vec3.add(camera_position_in_world, look_at_point, look_at_to_camera_position_vec);
         camera.updateCameraPosition(camera_position_in_world);
     };
-    // This matrix rotates arround an abitrary axis, I get this from the book 
-    // Mathematics for 3D Game Programming and Computer Graphics, Third Edition
-    const create_rotation_matrix = (axis, angle) => {
-        const cos_angle = Math.cos(angle);
-        const sin_angle = Math.sin(angle);
-        const rotation = glm.mat3.create();
-        rotation[0] = cos_angle + (1 - cos_angle) * (axis[0] * axis[0]);
-        rotation[1] = (1 - cos_angle) * axis[0] * axis[1] + sin_angle * axis[2];
-        rotation[2] = (1 - cos_angle) * axis[0] * axis[2] - sin_angle * axis[1];
-        rotation[3] = (1 - cos_angle) * axis[0] * axis[1] - sin_angle * axis[2];
-        rotation[4] = cos_angle + (1 - cos_angle) * (axis[1] * axis[1]);
-        rotation[5] = (1 - cos_angle) * axis[1] * axis[2] + sin_angle * axis[0];
-        rotation[6] = (1 - cos_angle) * axis[0] * axis[2] + sin_angle * axis[1];
-        rotation[7] = (1 - cos_angle) * axis[1] * axis[2] - sin_angle * axis[0];
-        rotation[8] = cos_angle + (1 - cos_angle) * (axis[2] * axis[2]);
-        return rotation;
+    const move_camera_with_mouse = (event) => {
+        const camera = cameras[current_camera];
+        const camera_position_in_world = camera.getCameraPosition();
+        const look_at_point = camera.getCameraLookingAt();
+        const camera_position_to_look_at_vec = glm.vec3.create();
+        glm.vec3.sub(camera_position_to_look_at_vec, look_at_point, camera_position_in_world);
+        const current_position = glm.vec2.fromValues(event.clientX, event.clientY);
+        const change = glm.vec2.create();
+        glm.vec2.sub(change, current_position, begin_movement);
+        const camera_matrix = cameras[current_camera].getCameraMatrix();
+        const y_axis_transformed = glm.vec3.fromValues(camera_matrix[4], camera_matrix[5], camera_matrix[6]);
+        const rotation_arround_y = glm.mat4.create();
+        glm.mat4.rotate(rotation_arround_y, rotation_arround_y, change[0] * -0.005, y_axis_transformed);
+        glm.vec3.transformMat4(camera_position_to_look_at_vec, camera_position_to_look_at_vec, rotation_arround_y);
+        const x_axis_transformed = glm.vec3.fromValues(camera_matrix[0], camera_matrix[1], camera_matrix[2]);
+        const rotation_arround_x = glm.mat4.create();
+        glm.mat4.rotate(rotation_arround_x, rotation_arround_x, change[1] * -0.005, x_axis_transformed);
+        glm.vec3.transformMat4(camera_position_to_look_at_vec, camera_position_to_look_at_vec, rotation_arround_x);
+        begin_movement = glm.vec2.clone(current_position);
+        glm.vec3.add(look_at_point, camera_position_in_world, camera_position_to_look_at_vec);
+        camera.updateLookAt(look_at_point);
     };
 }
 var before = 0;
