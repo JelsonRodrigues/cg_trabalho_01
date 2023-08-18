@@ -120,6 +120,83 @@ export class Spline {
     return true;
   }
 
+  public turnC0Continuous() {
+    if (this.curves.length <= 1) return;
+
+    for (let i = 0; i < this.curves.length - 1; ++i) {
+      const this_curve = this.curves[i];
+      const next_curve = this.curves[i+1];
+      
+      next_curve.changeControlPoint(0, this_curve.getControlPointByIndex(3) as glm.vec3);
+    }
+
+    this.sampleSpline();
+  }
+
+  public turnC1Continuous() {
+    if (this.curves.length <= 1) return;
+
+    for (let i = 0; i < this.curves.length - 1; ++i) {
+      const this_curve = this.curves[i];
+      const next_curve = this.curves[i+1];
+
+      const vec = glm.vec3.create();
+      glm.vec3.sub(vec, this_curve.getControlPointByIndex(3) as glm.vec3, this_curve.getControlPointByIndex(2) as glm.vec3);
+      glm.vec3.add(vec, this_curve.getControlPointByIndex(3) as glm.vec3, vec);
+      
+      next_curve.changeControlPoint(0, this_curve.getControlPointByIndex(3) as glm.vec3);
+      next_curve.changeControlPoint(1, vec);
+    }
+
+    this.sampleSpline();
+  }
+  public turnC2Continuous() {
+    if (this.curves.length <= 1) return;
+
+    for (let i = 0; i < this.curves.length - 1; ++i) {
+      const this_curve = this.curves[i];
+      const next_curve = this.curves[i+1];
+
+      const vec = glm.vec3.create();
+      glm.vec3.sub(vec, this_curve.getControlPointByIndex(3) as glm.vec3, this_curve.getControlPointByIndex(2) as glm.vec3);
+      glm.vec3.add(vec, this_curve.getControlPointByIndex(3) as glm.vec3, vec);
+      
+      next_curve.changeControlPoint(0, this_curve.getControlPointByIndex(3) as glm.vec3);
+      next_curve.changeControlPoint(1, vec);
+
+      glm.vec3.scaleAndAdd(vec, this_curve.getControlPointByIndex(1) as glm.vec3, vec, 4.0);
+      next_curve.changeControlPoint(2, vec);
+    }
+
+    this.sampleSpline();
+  }
+
+  public turnG0Continuous() {
+    this.turnC0Continuous();
+  }
+  public turnG1Continuous() {
+    if (this.curves.length <= 1) return;
+
+    for (let i = 0; i < this.curves.length - 1; ++i) {
+      const this_curve = this.curves[i];
+      const next_curve = this.curves[i+1];
+
+      const vec = glm.vec3.create();
+      glm.vec3.sub(vec, this_curve.getControlPointByIndex(3) as glm.vec3, this_curve.getControlPointByIndex(2) as glm.vec3);
+      glm.vec3.normalize(vec, vec);
+
+      const next_curve_vec_p0_p1 = glm.vec3.create();
+      glm.vec3.sub(next_curve_vec_p0_p1, next_curve.getControlPointByIndex(1) as glm.vec3, next_curve.getControlPointByIndex(0) as glm.vec3);
+      glm.vec3.scaleAndAdd(vec, this_curve.getControlPointByIndex(3) as glm.vec3, vec, glm.vec3.len(next_curve_vec_p0_p1));
+      
+      next_curve.changeControlPoint(0, this_curve.getControlPointByIndex(3) as glm.vec3);
+      next_curve.changeControlPoint(1, vec);
+    }
+
+    this.sampleSpline();
+  }
+  public turnG2Continuous() {}
+
   public toOBJ() : string {
     let res = "";
     for (let i=0; i < this.curves.length; ++i) {

@@ -78,6 +78,8 @@ async function main() {
   spline.addCurve(curve2);
   spline.addCurve(curve3);
 
+  spline.turnG1Continuous();
+
   cameras.push(
     new Camera([15, 10, 0], [0, 0, 0], [0, 1, 0]),
     new MovingCamera([0, 1, 0], spline, 15000),

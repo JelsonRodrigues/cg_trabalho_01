@@ -12,6 +12,8 @@ export class SplinePoints implements DrawableObject {
   private lines : number = 0;
   private buffer_vertices : WebGLBuffer;
   private vao : WebGLVertexArrayObject;
+  private buffer_control_points : WebGLBuffer;
+  private vao_control_points : WebGLVertexArrayObject;
 
   private static initialized : boolean = false;
   private static program : WebGLProgram;
@@ -25,6 +27,9 @@ export class SplinePoints implements DrawableObject {
     this.spline = spline;
     this.buffer_vertices = gl.createBuffer() as WebGLBuffer;
     this.vao = gl.createVertexArray() as WebGLVertexArrayObject;    
+
+    this.buffer_control_points = gl.createBuffer() as WebGLBuffer;
+    this.vao_control_points = gl.createVertexArray() as WebGLVertexArrayObject;
 
     if (!SplinePoints.initialized){
       this.setup(gl);
@@ -50,6 +55,14 @@ export class SplinePoints implements DrawableObject {
       );
 
     // Unbind VAO to other gl calls do not modify it
+    gl.bindVertexArray(this.vao_control_points);
+
+    // Draw the linse
+    gl.uniformMatrix4fv(SplinePoints.u_model, false, this.model);
+    gl.uniformMatrix4fv(SplinePoints.u_view, false, view);
+    gl.uniformMatrix4fv(SplinePoints.u_projection, false, projection);
+    
+    gl.drawArrays(WebGL2RenderingContext.LINES, 0, this.spline.getNumCurvesInSpline * 4);
     gl.bindVertexArray(null);
   } 
   
@@ -67,6 +80,19 @@ export class SplinePoints implements DrawableObject {
     gl.bufferData(WebGL2RenderingContext.ARRAY_BUFFER, data, WebGL2RenderingContext.STATIC_DRAW);
 
     this.lines = this.spline.array_points.length;
+
+    const spline_control_points = new Float32Array(this.spline.getNumCurvesInSpline * 3 * 4);
+    
+    for (let i = 0; i < this.spline.getNumCurvesInSpline;  ++i) {
+      const curve = this.spline.getCurveByIndex(i);
+      curve?.getControlPoints.forEach((value, index) => {
+        spline_control_points[i * 4 * 3 + index * 3 + 0] = value[0];
+        spline_control_points[i * 4 * 3 + index * 3 + 1] = value[1];
+        spline_control_points[i * 4 * 3 + index * 3 + 2] = value[2];
+      });
+    }
+    gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, this.buffer_control_points);
+    gl.bufferData(WebGL2RenderingContext.ARRAY_BUFFER, data, WebGL2RenderingContext.STATIC_DRAW);
   }
 
   setup(gl: WebGL2RenderingContext): void {
@@ -90,6 +116,25 @@ export class SplinePoints implements DrawableObject {
     
     // Tell VAO what buffer to bind
     gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, this.buffer_vertices);
+
+    // Tell it how to read Data
+    gl.enableVertexAttribArray(SplinePoints.a_position);
+
+    gl.vertexAttribPointer(
+      SplinePoints.a_position,
+      3, 
+      WebGL2RenderingContext.FLOAT, 
+      false, 
+      3 * Float32Array.BYTES_PER_ELEMENT, 
+      0 * Float32Array.BYTES_PER_ELEMENT
+    );
+    
+    // Unbind VAO buffer so other objects cannot modify it
+    gl.bindVertexArray(null);
+
+    gl.bindVertexArray(this.vao_control_points);
+    // Tell VAO what buffer to bind
+    gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, this.buffer_control_points);
 
     // Tell it how to read Data
     gl.enableVertexAttribArray(SplinePoints.a_position);
