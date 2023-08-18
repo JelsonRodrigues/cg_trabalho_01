@@ -13,7 +13,6 @@ export class Virus implements DrawableObject {
   private static program : WebGLProgram;
   private static vao : WebGLVertexArrayObject;
   private static buffer_vertices : WebGLBuffer;
-  private static buffer_index_vertices : WebGLBuffer;
   private static u_model : WebGLUniformLocation;
   private static u_view : WebGLUniformLocation;
   private static u_projection : WebGLUniformLocation;
@@ -21,7 +20,6 @@ export class Virus implements DrawableObject {
   private static a_normal : number;
   private static a_text_coord : number;
   private static vertices : number = 0;
-  private static faces : number = 0;
   private static texture : WebGLTexture;
 
   constructor (gl : WebGL2RenderingContext) {
@@ -51,12 +49,7 @@ export class Virus implements DrawableObject {
 
     gl.bindTexture(WebGL2RenderingContext.TEXTURE_2D, Virus.texture);
 
-    gl.drawElements(
-      WebGL2RenderingContext.TRIANGLES,
-      Virus.faces,
-      WebGL2RenderingContext.UNSIGNED_SHORT,
-      0
-    );
+    gl.drawArrays(WebGL2RenderingContext.TRIANGLES, 0, Virus.vertices);
 
     // Unbind VAO to other gl calls do not modify it
     gl.bindVertexArray(null);
@@ -82,7 +75,6 @@ export class Virus implements DrawableObject {
     
     // Create the vertices buffer
     Virus.buffer_vertices = gl.createBuffer() as WebGLBuffer;
-    Virus.buffer_index_vertices = gl.createBuffer() as WebGLBuffer;
 
     // Create the texture buffer
     Virus.texture = gl.createTexture() as WebGLTexture;
@@ -105,7 +97,6 @@ export class Virus implements DrawableObject {
     
     // Tell VAO what buffer to bind
     gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, Virus.buffer_vertices);
-    gl.bindBuffer(WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER, Virus.buffer_index_vertices);
 
     // Tell it how to read Data
     gl.vertexAttribPointer(
@@ -140,23 +131,22 @@ export class Virus implements DrawableObject {
     // Unbind VAO buffer so other objects cannot modify it
     gl.bindVertexArray(null);
     
-    const data = WebGLUtils.readObj("./objects/Virus/Coronavirus_Lowpoly.obj").then(
+    WebGLUtils.readObj("./objects/Virus/Coronavirus_Lowpoly.obj").then(
       ([vertexArray, vertexTextCoordArray, vertexNormalArray, 
         vertexIndexArray, vertexIndexTextCoordArray, vertexIndexNormalArray]) => {
-          console.log(vertexTextCoordArray);
-          const packed_data = new Float32Array(vertexArray.length * 8);
-          
-          for (let i = 0; i < vertexArray.length / 3; ++i) {
-            packed_data[8 * i + 0] = vertexArray[3 * i + 0];
-            packed_data[8 * i + 1] = vertexArray[3 * i + 1];
-            packed_data[8 * i + 2] = vertexArray[3 * i + 2];
+          const packed_data = new Float32Array(vertexIndexArray.length * 8);
 
-            packed_data[8 * i + 3] = vertexNormalArray[3 * i + 0];
-            packed_data[8 * i + 4] = vertexNormalArray[3 * i + 1];
-            packed_data[8 * i + 5] = vertexNormalArray[3 * i + 2];
+          for (let i = 0; i < vertexIndexArray.length; ++i) {
+            packed_data[i*8 + 0] = vertexArray[vertexIndexArray[i] * 3 + 0]; 
+            packed_data[i*8 + 1] = vertexArray[vertexIndexArray[i] * 3 + 1];  
+            packed_data[i*8 + 2] = vertexArray[vertexIndexArray[i] * 3 + 2]; 
 
-            packed_data[8 * i + 6] = vertexTextCoordArray[2*i + 0];
-            packed_data[8 * i + 7] = vertexTextCoordArray[2*i + 1];
+            packed_data[i*8 + 3] = vertexNormalArray[vertexIndexNormalArray[i] * 3 + 0];
+            packed_data[i*8 + 4] = vertexNormalArray[vertexIndexNormalArray[i] * 3 + 1];
+            packed_data[i*8 + 5] = vertexNormalArray[vertexIndexNormalArray[i] * 3 + 2];
+
+            packed_data[i*8 + 6] = vertexTextCoordArray[vertexIndexTextCoordArray[i] * 2 + 0];
+            packed_data[i*8 + 7] = vertexTextCoordArray[vertexIndexTextCoordArray[i] * 2 + 1];
           }
 
           gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, Virus.buffer_vertices);
@@ -166,20 +156,12 @@ export class Virus implements DrawableObject {
             WebGL2RenderingContext.STATIC_DRAW
           );
 
-          gl.bindBuffer(WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER, Virus.buffer_index_vertices);
-          gl.bufferData(
-            WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER,
-            new Uint16Array(vertexIndexArray),
-            WebGL2RenderingContext.STATIC_DRAW,
-          );
-
-          Virus.vertices = vertexArray.length / 3;
-          Virus.faces = vertexIndexArray.length;
+          Virus.vertices = vertexIndexArray.length;
         }
     );
 
     // Read the texture
-    fetch("objects/Virus/coronavirus spec.png")
+    fetch("objects/Virus/coronavirus diffuse.png")
     .then(response => response.blob())
     .then(blob => {
       const image = new Image();
