@@ -5,9 +5,17 @@ import { WebGLUtils } from "./WebGLUtils";
 
 import vertexSource from "../shaders/virusVertexShader.glsl";
 import fragmentSource from "../shaders/virusFragmentShader.glsl";
+import { AnimatedObject } from "./AnimatedObject";
 
-export class Virus implements DrawableObject {
+export class Virus implements DrawableObject, AnimatedObject {
   public model : glm.mat4;
+  private time_total : number = 10_000 * Math.random() + 5_000;
+  private accumulated_time : number = 0;
+  private paused_animation : boolean = false;
+  private z_radius : number = Math.random() * 10;
+  private x_radius : number = Math.random() * 10;
+  private y_radius : number = Math.random() * 10;
+  private rotation_orientation : number = Math.ceil(Math.random() * 2) % 2 == 0 ? 1.0 : -1.0 ;
 
   private static initialized = false;
   private static program : WebGLProgram;
@@ -25,7 +33,6 @@ export class Virus implements DrawableObject {
   constructor (gl : WebGL2RenderingContext) {
     this.model = glm.mat4.create();
     glm.mat4.scale(this.model, this.model, [1/15.0, 1/15.0, 1/15.0]);
-    glm.mat4.translate(this.model, this.model, [53, 75, 0]);
     
     // This will be done just for the first object of this class
     // All the next will reuse the information about the buffers and how to draw them
@@ -36,6 +43,36 @@ export class Virus implements DrawableObject {
       this.setup(gl);
     }
     Virus.initialized = true;
+  }
+
+  updateAnimation(fElapsedTime:number): void {
+    if (!this.paused_animation) {
+      if (this.accumulated_time + fElapsedTime >= this.time_total) {
+        this.x_radius += (Math.random() *2.0 - 1.0);
+      }
+      this.accumulated_time = (this.accumulated_time + fElapsedTime) % this.time_total;
+      const percent_animation = this.accumulated_time / this.time_total;
+      this.model[12] = Math.cos(2 * Math.PI * percent_animation * this.rotation_orientation) * this.x_radius ;
+      this.model[13] = this.y_radius;
+      this.model[14] = Math.sin(2 * Math.PI * percent_animation * this.rotation_orientation) * this.z_radius ;
+      console.log(this.rotation_orientation);
+    }
+  }
+
+  resetAnimation(): void {
+    this.accumulated_time = 0;
+  }
+
+  toggleAnimation(): void {
+    this.paused_animation = !this.paused_animation;
+  }
+
+  pauseAnimation(): void {
+    this.paused_animation = true;
+  }
+
+  resumeAnimation(): void {
+    this.paused_animation = false;
   }
 
   draw(gl: WebGL2RenderingContext, view : glm.mat4, projection : glm.mat4) : void {

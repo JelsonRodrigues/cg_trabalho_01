@@ -15,6 +15,7 @@ export class MovingCamera extends Camera implements AnimatedObject {
     this.camera_path = camera_path;
     this.time_total = time_complete_path_ms;
   }
+  
 
   updateAnimation(fElapsedTime:number): void {
     if (!this.paused_animation) {
@@ -30,6 +31,14 @@ export class MovingCamera extends Camera implements AnimatedObject {
   }
 
   toggleAnimation(): void {
-    this.paused_animation != this.paused_animation;
+    this.paused_animation = !this.paused_animation;
+  }
+
+  pauseAnimation(): void {
+    this.paused_animation = true;
+  }
+
+  resumeAnimation(): void {
+    this.paused_animation = false;
   }
 }
