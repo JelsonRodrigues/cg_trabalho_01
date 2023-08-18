@@ -44,6 +44,8 @@ export class GlowKnife implements DrawableObject {
     gl.uniformMatrix4fv(GlowKnife.u_view, false, view);
     gl.uniformMatrix4fv(GlowKnife.u_projection, false, projection);
 
+    gl.bindTexture(WebGL2RenderingContext.TEXTURE_2D, GlowKnife.texture);
+
     gl.drawElements(
       WebGL2RenderingContext.TRIANGLES,
       GlowKnife.faces,
