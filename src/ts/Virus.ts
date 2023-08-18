@@ -22,6 +22,7 @@ export class Virus implements DrawableObject {
   private static a_text_coord : number;
   private static vertices : number = 0;
   private static faces : number = 0;
+  private static texture : WebGLTexture;
 
   constructor (gl : WebGL2RenderingContext) {
     this.model = glm.mat4.create();
@@ -47,6 +48,8 @@ export class Virus implements DrawableObject {
     gl.uniformMatrix4fv(Virus.u_model, false, this.model);
     gl.uniformMatrix4fv(Virus.u_view, false, view);
     gl.uniformMatrix4fv(Virus.u_projection, false, projection);
+
+    gl.bindTexture(WebGL2RenderingContext.TEXTURE_2D, Virus.texture);
 
     gl.drawElements(
       WebGL2RenderingContext.TRIANGLES,
@@ -80,6 +83,21 @@ export class Virus implements DrawableObject {
     // Create the vertices buffer
     Virus.buffer_vertices = gl.createBuffer() as WebGLBuffer;
     Virus.buffer_index_vertices = gl.createBuffer() as WebGLBuffer;
+
+    // Create the texture buffer
+    Virus.texture = gl.createTexture() as WebGLTexture;
+    gl.bindTexture(WebGL2RenderingContext.TEXTURE_2D, Virus.texture);
+    gl.texImage2D(
+      WebGL2RenderingContext.TEXTURE_2D, 
+      0, 
+      WebGL2RenderingContext.RGBA, 
+      1, 
+      1, 
+      0, 
+      WebGL2RenderingContext.RGBA, 
+      WebGL2RenderingContext.UNSIGNED_BYTE, 
+      new Uint8Array([255, 32, 64, 255])
+    );
 
     // Create the Vertex Array Object
     Virus.vao = gl.createVertexArray() as WebGLVertexArrayObject;    
@@ -125,6 +143,7 @@ export class Virus implements DrawableObject {
     const data = WebGLUtils.readObj("./objects/Virus/Coronavirus_Lowpoly.obj").then(
       ([vertexArray, vertexTextCoordArray, vertexNormalArray, 
         vertexIndexArray, vertexIndexTextCoordArray, vertexIndexNormalArray]) => {
+          console.log(vertexTextCoordArray);
           const packed_data = new Float32Array(vertexArray.length * 8);
           
           for (let i = 0; i < vertexArray.length / 3; ++i) {
@@ -136,8 +155,8 @@ export class Virus implements DrawableObject {
             packed_data[8 * i + 4] = vertexNormalArray[3 * i + 1];
             packed_data[8 * i + 5] = vertexNormalArray[3 * i + 2];
 
-            packed_data[8 * i + 6] = 0;
-            packed_data[8 * i + 7] = 0;
+            packed_data[8 * i + 6] = vertexTextCoordArray[2*i + 0];
+            packed_data[8 * i + 7] = vertexTextCoordArray[2*i + 1];
           }
 
           gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, Virus.buffer_vertices);
@@ -158,5 +177,18 @@ export class Virus implements DrawableObject {
           Virus.faces = vertexIndexArray.length;
         }
     );
+
+    // Read the texture
+    fetch("objects/Virus/coronavirus spec.png")
+    .then(response => response.blob())
+    .then(blob => {
+      const image = new Image();
+      image.onload = () => {
+        gl.bindTexture(WebGL2RenderingContext.TEXTURE_2D, Virus.texture);
+        gl.texImage2D(WebGL2RenderingContext.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        gl.generateMipmap(gl.TEXTURE_2D);
+      };
+      image.src = URL.createObjectURL(blob);
+    });
   }
 }
