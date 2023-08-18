@@ -4,9 +4,6 @@ precision highp float;
 
 // Vertex attributes
 layout( location=0 ) in vec4 position;
-// layout( location=1 ) in vec2 uv_text_coord;
-
-// out vec2 f_uv_text_coord;
 
 // Aplica perspectiva para os pontos
 uniform mat4x4 projection;

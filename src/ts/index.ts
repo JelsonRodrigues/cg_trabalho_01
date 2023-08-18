@@ -11,7 +11,7 @@ import { CameraCoordinates } from "./CameraCoordinates";
 import { Virus } from "./Virus";
 import { GlowKnife } from "./GlowKnife";
 import { MovingCamera } from "./MovingCamera";
-import { SplinePoints } from "./SplinePath";
+import { SplinePoints } from "./SplinePoints";
 import { AnimatedObject } from "./AnimatedObject";
 
 var canva : HTMLCanvasElement;
@@ -139,7 +139,6 @@ function setupEventHandlers() {
         camera.updateLookAt(look_at);
         break;
       case "KeyV":
-        console.log("Changed Camera");
         camera = cameras[current_camera];
         if (camera instanceof MovingCamera) { camera.pauseAnimation(); } // Pause animation
         current_camera = (current_camera + 1) % cameras.length;
@@ -152,7 +151,48 @@ function setupEventHandlers() {
   canva.addEventListener("pointerdown", (event) => {
     begin_movement[0] = event.clientX;
     begin_movement[1] = event.clientY;
+    console.log((begin_movement[0] *2.0) / canva.width -1.0, (-begin_movement[1] * 2.0) / canva.height + 1.0);
     if (event.button == 0) {
+      // Check if the click is in a control point
+      const splines = objects.filter((object) => {
+        return object instanceof SplinePoints;
+      });
+      console.log(splines);
+      for (let i=0; i< splines.length; ++i) {
+        let spline = splines[i] as SplinePoints;
+        for (let c = 0; c < spline.spline.getNumCurvesInSpline; ++c) {
+          const curve = spline.spline.getCurveByIndex(c) as CubicBezierCurve;
+          const num_control_points = (curve.getControlPoints as glm.vec3[]).length;
+          for (let j = 0; j < num_control_points; ++j) {
+            const point = curve.getControlPointByIndex(j) as glm.vec3;
+
+            // Apply transformations and see if it would be in the same location
+            const transformed_point = glm.vec3.create();
+            glm.vec3.transformMat4(transformed_point, point, cameras[current_camera].getViewMatrix());
+            glm.vec3.transformMat4(transformed_point, transformed_point, perspective);
+            
+            
+            const dist_vec = glm.vec2.sub(
+              glm.vec2.create(), 
+              glm.vec2.fromValues((begin_movement[0] *2.0) / canva.width -1.0, (-begin_movement[1] * 2.0) / canva.height + 1.0), 
+              glm.vec2.fromValues(transformed_point[0], transformed_point[1]) 
+              );
+            
+            // Radius 
+            // The further away the point is, the less space it will ocuppy in screen, so I 
+            // Must decrease the radius acordingly to the z percentage of the point in relation
+            // With the view frustum
+            const dist = glm.vec2.length(dist_vec);
+            const RADIUS = 0.06;
+            if (dist <= RADIUS) {
+              canva.addEventListener("pointermove", modify_spline);
+            }
+
+          }
+        }
+      }
+
+      // Otherwise 
       canva.addEventListener("pointermove", orbit_camera_with_mouse);
     }
     else if (event.button == 2) {
@@ -190,6 +230,10 @@ function setupEventHandlers() {
 
     camera.updateCameraPosition(camera_position_in_world);
   });
+
+  const modify_spline = (event: PointerEvent) => {
+    // TODO CODE
+  }
 
   const orbit_camera_with_mouse = (event: PointerEvent) => {
     const camera = cameras[current_camera];

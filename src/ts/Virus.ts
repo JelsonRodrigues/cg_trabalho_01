@@ -55,7 +55,6 @@ export class Virus implements DrawableObject, AnimatedObject {
       this.model[12] = Math.cos(2 * Math.PI * percent_animation * this.rotation_orientation) * this.x_radius ;
       this.model[13] = this.y_radius;
       this.model[14] = Math.sin(2 * Math.PI * percent_animation * this.rotation_orientation) * this.z_radius ;
-      console.log(this.rotation_orientation);
     }
   }
 

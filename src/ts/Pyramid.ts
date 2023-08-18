@@ -17,6 +17,7 @@ export class Pyramid implements DrawableObject {
   private static u_model : WebGLUniformLocation;
   private static u_view : WebGLUniformLocation;
   private static u_projection : WebGLUniformLocation;
+  private static u_color: WebGLUniformLocation;
   private static a_position : number;
   private static vertices : number = 0;
   private static faces : number = 0;
@@ -41,6 +42,7 @@ export class Pyramid implements DrawableObject {
     gl.uniformMatrix4fv(Pyramid.u_model, false, this.model);
     gl.uniformMatrix4fv(Pyramid.u_view, false, view);
     gl.uniformMatrix4fv(Pyramid.u_projection, false, projection);
+    gl.uniform4f(Pyramid.u_color, 0.0, 1.0, 1.0, 1.0);
 
     gl.drawElements(
       WebGL2RenderingContext.TRIANGLES,
@@ -66,7 +68,7 @@ export class Pyramid implements DrawableObject {
     Pyramid.u_model = gl.getUniformLocation(Pyramid.program, "model") as WebGLUniformLocation;
     Pyramid.u_view = gl.getUniformLocation(Pyramid.program, "view") as WebGLUniformLocation;
     Pyramid.u_projection = gl.getUniformLocation(Pyramid.program, "projection") as WebGLUniformLocation;
-    
+    Pyramid.u_color = gl.getUniformLocation(Pyramid.program, "color") as WebGLUniformLocation;
     Pyramid.a_position = gl.getAttribLocation(Pyramid.program, "position");
     
     // Create the vertices buffer

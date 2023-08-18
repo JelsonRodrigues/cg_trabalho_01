@@ -16,6 +16,7 @@ export class F implements DrawableObject {
   private static u_model : WebGLUniformLocation;
   private static u_view : WebGLUniformLocation;
   private static u_projection : WebGLUniformLocation;
+  private static u_color : WebGLUniformLocation;
   private static a_position : number;
   private static vertices : number = 0;
 
@@ -42,6 +43,7 @@ export class F implements DrawableObject {
     gl.uniformMatrix4fv(F.u_model, false, this.model);
     gl.uniformMatrix4fv(F.u_view, false, view);
     gl.uniformMatrix4fv(F.u_projection, false, projection);
+    gl.uniform4f(F.u_color, 0.0, 1.0, 0.0, 1.0);
 
     gl.drawArrays(
       WebGL2RenderingContext.TRIANGLES,
@@ -67,8 +69,9 @@ export class F implements DrawableObject {
     F.u_model = gl.getUniformLocation(F.program, "model") as WebGLUniformLocation;
     F.u_view = gl.getUniformLocation(F.program, "view") as WebGLUniformLocation;
     F.u_projection = gl.getUniformLocation(F.program, "projection") as WebGLUniformLocation;
-    
+    F.u_color = gl.getUniformLocation(F.program, "color") as WebGLUniformLocation;
     F.a_position = gl.getAttribLocation(F.program, "position");
+
     
     // Create the Vertex Array Object
     F.vao = gl.createVertexArray() as WebGLVertexArrayObject;    

@@ -20,6 +20,7 @@ export class SplinePoints implements DrawableObject {
   private static u_model : WebGLUniformLocation;
   private static u_view : WebGLUniformLocation;
   private static u_projection : WebGLUniformLocation;
+  private static u_color : WebGLUniformLocation;
   private static a_position : number;
 
   constructor (gl : WebGL2RenderingContext, spline : Spline) {
@@ -40,6 +41,7 @@ export class SplinePoints implements DrawableObject {
   }
 
   draw(gl: WebGL2RenderingContext, view : glm.mat4, projection : glm.mat4) : void {
+    gl.disable(gl.DEPTH_TEST);
     gl.useProgram(SplinePoints.program as WebGLProgram);
 
     gl.bindVertexArray(this.vao);
@@ -47,6 +49,7 @@ export class SplinePoints implements DrawableObject {
     gl.uniformMatrix4fv(SplinePoints.u_model, false, this.model);
     gl.uniformMatrix4fv(SplinePoints.u_view, false, view);
     gl.uniformMatrix4fv(SplinePoints.u_projection, false, projection);
+    gl.uniform4f(SplinePoints.u_color, 1.0, 0.0, 0.0, 1.0);
 
     gl.drawArrays(
       WebGL2RenderingContext.LINE_STRIP, 
@@ -54,16 +57,19 @@ export class SplinePoints implements DrawableObject {
       this.lines
       );
 
-    // Unbind VAO to other gl calls do not modify it
+    
     gl.bindVertexArray(this.vao_control_points);
 
-    // Draw the linse
+    // Draw the lines and control points
     gl.uniformMatrix4fv(SplinePoints.u_model, false, this.model);
     gl.uniformMatrix4fv(SplinePoints.u_view, false, view);
     gl.uniformMatrix4fv(SplinePoints.u_projection, false, projection);
+    gl.uniform4f(SplinePoints.u_color, 0.1, 0.1, 0.1, 1.0);
     
     gl.drawArrays(WebGL2RenderingContext.LINES, 0, this.spline.getNumCurvesInSpline * 4);
+    gl.drawArrays(WebGL2RenderingContext.POINTS, 0, this.spline.getNumCurvesInSpline * 4);
     gl.bindVertexArray(null);
+    gl.enable(gl.DEPTH_TEST);
   } 
   
   updateSplinePoints(gl : WebGL2RenderingContext) {
@@ -92,7 +98,7 @@ export class SplinePoints implements DrawableObject {
       });
     }
     gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, this.buffer_control_points);
-    gl.bufferData(WebGL2RenderingContext.ARRAY_BUFFER, data, WebGL2RenderingContext.STATIC_DRAW);
+    gl.bufferData(WebGL2RenderingContext.ARRAY_BUFFER, spline_control_points, WebGL2RenderingContext.STATIC_DRAW);
   }
 
   setup(gl: WebGL2RenderingContext): void {
@@ -108,6 +114,7 @@ export class SplinePoints implements DrawableObject {
     SplinePoints.u_model = gl.getUniformLocation(SplinePoints.program, "model") as WebGLUniformLocation;
     SplinePoints.u_view = gl.getUniformLocation(SplinePoints.program, "view") as WebGLUniformLocation;
     SplinePoints.u_projection = gl.getUniformLocation(SplinePoints.program, "projection") as WebGLUniformLocation;
+    SplinePoints.u_color = gl.getUniformLocation(SplinePoints.program, "color") as WebGLUniformLocation;
     
     SplinePoints.a_position = gl.getAttribLocation(SplinePoints.program, "position");
     
