@@ -14,6 +14,7 @@ import { GlowKnife } from "./GlowKnife";
 import { MovingCamera } from "./MovingCamera";
 import { SplinePoints } from "./SplinePoints";
 import { AnimatedObject } from "./AnimatedObject";
+import { Cabin } from "./Cabin";
 
 var canva : HTMLCanvasElement;
 var gl : WebGL2RenderingContext;
@@ -141,13 +142,15 @@ async function main() {
 
   const virus_to_awm_follow = new Virus(gl, [ -25, 6, 10 ]);
   virus_to_awm_follow.time_total = 3000;
-  // glm.vec3.add(translation, glm.vec3.create(), [ 50, 15, -30 ]);
-  // glm.mat4.translate(virus_to_awm_follow.model, virus_to_awm_follow.model, translation);
   glm.mat4.scale(virus_to_awm_follow.model, virus_to_awm_follow.model, [2.0, 2.0, 2.0]);
   objects.push(virus_to_awm_follow);
   animated_objects.push(virus_to_awm_follow);
   const awm = new AWM(gl, virus_to_awm_follow);
+  const awm2 = new AWM(gl, virus_to_awm_follow);
+  awm2.model[12] -= 25;
+  awm2.model[14] += 5;
   animated_objects.push(awm);
+  animated_objects.push(awm2);
 
   objects.push(
     // new F(gl),
@@ -156,7 +159,9 @@ async function main() {
     new GlowKnife(gl),
     // new SplinePoints(gl, spline),
     new Tower(gl),
+    new Cabin(gl),
     awm,
+    awm2,
   );
 
   setupEventHandlers();

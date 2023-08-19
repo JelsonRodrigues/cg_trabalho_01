@@ -1,0 +1,519 @@
+# Blender 3.6.2 MTL File: 'None'
+# www.blender.org
+
+newmtl Material.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd source/work 15/rough_wood_diff_4k-1.png
+map_Bump -bm 1.000000 source/work 15/rough_wood_nor_gl_4k.png
+
+newmtl Material.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd source/work 15/rough_wood_diff_4k-1.png
+map_Bump -bm 1.000000 source/work 15/rough_wood_nor_gl_4k.png
+
+newmtl Material.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd source/work 15/rough_wood_diff_4k-1.png
+map_Bump -bm 1.000000 source/work 15/rough_wood_nor_gl_4k.png
+
+newmtl Material.004
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd source/work 15/rough_wood_diff_4k.jpg
+map_Bump -bm 1.000000 source/work 15/rough_wood_nor_gl_4k.png
+
+newmtl Material.005
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 0.999997 0.2 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 0.999997 0.2 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.006
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 0.6 7.1 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 0.6 7.1 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.007
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 0.3 7.1 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 0.3 7.1 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.008
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 0.4 7.1 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 0.4 7.1 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.009
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd source/work 15/rough_wood_diff_4k-1.png
+map_Bump -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.010
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd source/work 15/rough_wood_diff_4k-1.png
+map_Bump -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.011
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 0.6 7.1 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 0.6 7.1 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.012
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 0.6 7.1 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 0.6 7.1 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.013
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 0.3 7.1 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 0.3 7.1 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.014
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s -0.2 2.6 1 source/work 15/bark_willow_diff_4k.jpg
+map_Bump -s -0.2 2.6 1 -bm 1.000000 source/work 15/bark_willow_nor_gl_4k.png
+
+newmtl Material.015
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 1.9 0.6 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 1.9 0.6 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.016
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s -0.2 2.6 1 source/work 15/bark_willow_diff_4k.jpg
+map_Bump -s -0.2 2.6 1 -bm 1.000000 source/work 15/bark_willow_nor_gl_4k.png
+
+newmtl Material.017
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 0.3 7.1 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 0.3 7.1 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.018
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 0.6 7.1 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 0.6 7.1 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.019
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 0.6 7.1 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 0.6 7.1 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.020
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 8.1 -1.3 1 source/work 15/bark_willow_diff_4k.jpg
+map_Bump -s 8.1 -1.3 1 -bm 1.000000 source/work 15/bark_willow_nor_gl_4k.png
+
+newmtl Material.021
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 8.1 -1.3 1 source/work 15/bark_willow_diff_4k.jpg
+map_Bump -s 8.1 -1.3 1 -bm 1.000000 source/work 15/bark_willow_nor_gl_4k.png
+
+newmtl Material.022
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 8.1 -1.3 1 source/work 15/bark_willow_diff_4k.jpg
+map_Bump -s 8.1 -1.3 1 -bm 1.000000 source/work 15/bark_willow_nor_gl_4k.png
+
+newmtl Material.023
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 8.1 -1.3 1 source/work 15/bark_willow_diff_4k.jpg
+map_Bump -s 8.1 -1.3 1 -bm 1.000000 source/work 15/bark_willow_nor_gl_4k.png
+
+newmtl Material.024
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 1.9 0.4 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 1.9 0.4 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.025
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 8.1 -1.3 1 source/work 15/bark_willow_diff_4k.jpg
+map_Bump -s 8.1 -1.3 1 -bm 1.000000 source/work 15/bark_willow_nor_gl_4k.png
+
+newmtl Material.026
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s -0.2 2.6 1 source/work 15/bark_willow_diff_4k.jpg
+map_Bump -s -0.2 2.6 1 -bm 1.000000 source/work 15/bark_willow_nor_gl_4k.png
+
+newmtl Material.027
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 1.8 0.2 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 1.8 0.2 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.028
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -o -0.6 1.9 0 -s 1.1 1 1 source/work 15/reed_roof_04_diff_4k.jpg
+map_Bump -o -0.6 1.9 0 -s 1.1 1 1 -bm 1.000000 source/work 15/reed_roof_04_nor_gl_4k_exr.png
+
+newmtl Material.029
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 1.6 0.4 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 1.6 0.4 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.030
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 1.6 0.4 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 1.6 0.4 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.031
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s -0.2 2.6 1 source/work 15/bark_willow_diff_4k.jpg
+map_Bump -s -0.2 2.6 1 -bm 1.000000 source/work 15/bark_willow_nor_gl_4k.png
+
+newmtl Material.032
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 3.6 0.4 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 3.6 0.4 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.033
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 3.6 0.6 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 3.6 0.6 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.034
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 1.8 0.4 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 1.8 0.4 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.035
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 3.7 0.4 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 3.7 0.4 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.036
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 3.6 0.5 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 3.6 0.5 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.037
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 0.999997 0.2 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 0.999997 0.2 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.038
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 0.999997 0.2 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 0.999997 0.2 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.039
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 1.6 0.4 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 1.6 0.4 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.040
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 1.6 0.2 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 1.6 0.2 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.041
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 1.6 0.4 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 1.6 0.4 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.042
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 1.8 0.0999999 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 1.8 0.0999999 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.043
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 1.5 0.4 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 1.5 0.4 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.044
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s -0.399998 -1.1 1 source/work 15/bark_willow_diff_4k.jpg
+map_Bump -s -0.399998 -1.1 1 -bm 1.000000 source/work 15/bark_willow_nor_gl_4k.png
+
+newmtl Material.045
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 1.5 1.9 1 source/work 15/bark_willow_diff_4k.jpg
+map_Bump -s 1.5 1.9 1 -bm 1.000000 source/work 15/bark_willow_nor_gl_4k_exr.png
+
+newmtl Material.046
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 2.5 2 1 source/work 15/rough_wood_diff_4k-1.png
+map_Bump -s 2.5 2 1 -bm 1.000000 source/work 15/rough_wood_nor_gl_4k_exr.png
+
+newmtl Material.047
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -s 8.1 -1.3 1 source/work 15/bark_willow_diff_4k.jpg
+map_Bump -s 8.1 -1.3 1 -bm 1.000000 source/work 15/bark_willow_nor_gl_4k.png
