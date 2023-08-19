@@ -192,7 +192,6 @@ export class Tower implements DrawableObject {
   
     WebGLUtils.readObj("./objects/Tower/obj/lp_tower.obj").then(
       (obj_result) => {
-        console.log(obj_result);
         const packed_data = new Float32Array(obj_result.index_vertices.length * 8);
 
         for (let i = 0; i < obj_result.index_vertices.length; ++i) {

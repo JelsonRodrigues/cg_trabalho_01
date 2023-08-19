@@ -9,7 +9,7 @@ import { AnimatedObject } from "./AnimatedObject";
 
 export class Virus implements DrawableObject, AnimatedObject {
   public model : glm.mat4;
-  private time_total : number = 10_000 * Math.random() + 5_000;
+  public time_total : number = 10_000 * Math.random() + 5_000;
   private roation_axis : glm.vec3 = glm.vec3.fromValues(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
   private accumulated_time : number = 0;
   private paused_animation : boolean = false;
@@ -17,6 +17,7 @@ export class Virus implements DrawableObject, AnimatedObject {
   private x_radius : number = Math.random() * 10;
   private y_radius : number = Math.random() * 10;
   private rotation_orientation : number = Math.ceil(Math.random() * 2) % 2 == 0 ? 1.0 : -1.0 ;
+  private roation_center : glm.vec3;
 
   private static initialized = false;
   private static program : WebGLProgram;
@@ -31,10 +32,11 @@ export class Virus implements DrawableObject, AnimatedObject {
   private static vertices : number = 0;
   private static texture : WebGLTexture;
 
-  constructor (gl : WebGL2RenderingContext) {
+  constructor (gl : WebGL2RenderingContext, roation_center:glm.vec3 = glm.vec3.create()) {
     this.model = glm.mat4.create();
     glm.mat4.scale(this.model, this.model, [1/25.0, 1/25.0, 1/25.0]);
-    
+    this.roation_center = roation_center;
+
     // This will be done just for the first object of this class
     // All the next will reuse the information about the buffers and how to draw them
     // The only thing that will be particular to any object will be the model matrix, 
@@ -56,9 +58,9 @@ export class Virus implements DrawableObject, AnimatedObject {
       
       glm.mat4.rotate(this.model, this.model, 0.001 * fElapsedTime, this.roation_axis);
 
-      this.model[12] = Math.cos(2 * Math.PI * percent_animation * this.rotation_orientation) * this.x_radius ;
-      this.model[13] = this.y_radius;
-      this.model[14] = Math.sin(2 * Math.PI * percent_animation * this.rotation_orientation) * this.z_radius ;
+      this.model[12] = this.roation_center[0] + Math.cos(2 * Math.PI * percent_animation * this.rotation_orientation) * this.x_radius ;
+      this.model[13] = this.roation_center[1] +this.y_radius;
+      this.model[14] = this.roation_center[2] + Math.sin(2 * Math.PI * percent_animation * this.rotation_orientation) * this.z_radius ;
     }
   }
 

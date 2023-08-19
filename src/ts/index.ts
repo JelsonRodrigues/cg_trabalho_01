@@ -7,6 +7,7 @@ import { Camera } from "./Camera";
 import { F } from "./F";
 import { Pyramid } from "./Pyramid";
 import { Ground } from "./Ground";
+import { AWM } from "./AWM"
 import { Tower } from "./Tower";
 import { Virus } from "./Virus";
 import { GlowKnife } from "./GlowKnife";
@@ -132,15 +133,21 @@ async function main() {
 
   animated_objects.push(moving_camera);
 
-  let translation = glm.vec3.create();
   for (let i =0; i < 35; ++i){
     const virus = new Virus(gl);
-
-    glm.vec3.add(translation, translation, [ 50, 15, 3 ]);
-    glm.mat4.translate(virus.model, virus.model, translation);
     objects.push(virus);
     animated_objects.push(virus);
   }
+
+  const virus_to_awm_follow = new Virus(gl, [ -25, 6, 10 ]);
+  virus_to_awm_follow.time_total = 3000;
+  // glm.vec3.add(translation, glm.vec3.create(), [ 50, 15, -30 ]);
+  // glm.mat4.translate(virus_to_awm_follow.model, virus_to_awm_follow.model, translation);
+  glm.mat4.scale(virus_to_awm_follow.model, virus_to_awm_follow.model, [2.0, 2.0, 2.0]);
+  objects.push(virus_to_awm_follow);
+  animated_objects.push(virus_to_awm_follow);
+  const awm = new AWM(gl, virus_to_awm_follow);
+  animated_objects.push(awm);
 
   objects.push(
     // new F(gl),
@@ -149,6 +156,7 @@ async function main() {
     new GlowKnife(gl),
     // new SplinePoints(gl, spline),
     new Tower(gl),
+    awm,
   );
 
   setupEventHandlers();
@@ -419,6 +427,7 @@ function setupEventHandlers() {
 
     begin_movement = glm.vec2.clone(current_position);
     glm.vec3.add(camera_position_in_world, look_at_point, look_at_to_camera_position_vec);
+    if (camera_position_in_world[1] < 0.5) camera_position_in_world[1] = 0.5; // do not let camera go underground
     camera.updateCameraPosition(camera_position_in_world);
   }
 
