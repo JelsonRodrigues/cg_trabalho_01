@@ -58,30 +58,54 @@ async function main() {
 
   spline = new Spline(30);
   const curve = new CubicBezierCurve(
-    [-10.0, 10.0, -10.0],
-    [-5.0, 0.0, -30.0],
-    [5.0, 0.0, -30.0],
-    [0.0, 0.0, 10.0]);
+    [-9.217018127441406, 2.861806631088257, -16.13921356201172],
+    [13.516002655029297, -0.3669872283935547, -19.892250061035156],
+    [15.274385452270508, 4.701427459716797, -6.95806884765625],
+    [6.714755535125732, 2.398991346359253, 10.73779296875]);
 
   const curve2 = new CubicBezierCurve(
-    [0.0, 0.0, 10.0],
-    [0.0, 10.0, 5.0],
-    [5.0, 15.0, -5.0],
-    [1.0, 5.0, -10.0]);
+    [6.714755535125732, 2.398991346359253, 10.73779296875],
+    [1.5150108337402344, 0.6092761754989624, 21.847110748291016],
+    [4.333532333374023, 19.296329498291016, 10.84915828704834],
+    [-5.867332458496094, 11.919515609741211, 10.881692886352539]);
 
   const curve3 = new CubicBezierCurve(
-    [1.0, 5.0, -10.0],
-    [-10.0, 6.0, -5.0],
-    [-6.0, 7.0, 5.0],
-    [5.0, 4.0, -5.0]);
+    [-5.867332458496094, 11.919515609741211, 10.881692886352539],
+    [-19.680273056030273, 1.9306092262268066, 10.925747871398926],
+    [-13.041866302490234, 6.362720489501953, -0.6656398773193359],
+    [-16.463207244873047, 12.278007507324219, -7.226930618286133]);
   
+  const curve4 = new CubicBezierCurve(
+    [-16.463207244873047, 12.278007507324219, -7.226930618286133],
+    [-26.186386108398438, 29.088781356811523, -25.873594284057617],
+    [-15.629554748535156, 3.681765556335449, -15.161378860473633],
+    [-9.217018127441406, 2.861806631088257, -16.13921356201172]);
+    
   spline.addCurve(curve);
   spline.addCurve(curve2);
   spline.addCurve(curve3);
+  spline.addCurve(curve4);
 
   spline.turnG1Continuous();
 
-  const moving_camera = new MovingCamera([0, 1, 0], spline, 15000);
+  const spline_camera_look = new Spline();
+  spline_camera_look.addCurve(
+    new CubicBezierCurve(
+      [5.0, 5.0, 5.0],
+      [0.0, 2.5, 0.0],
+      [0.0, 2.5, 0.0],
+      [-5.0, 5.0, -5.0])
+  );
+
+  spline_camera_look.addCurve(
+    new CubicBezierCurve(
+      [-5.0, 5.0, -5.0],
+      [0.0, 2.5, 0.0],
+      [0.0, 2.5, 0.0],
+      [5.0, 5.0, 5.0])
+  );
+
+  const moving_camera = new MovingCamera([0, 1, 0], spline, spline_camera_look, 15000);
   
   cameras.push(
     new Camera([15, 10, 0], [0, 0, 0], [0, 1, 0]),
@@ -105,7 +129,7 @@ async function main() {
     new Pyramid(gl),
     new Ground(gl),
     new GlowKnife(gl),
-    new SplinePoints(gl, spline),
+    // new SplinePoints(gl, spline),
   );
 
   setupEventHandlers();
@@ -227,7 +251,7 @@ function setupEventHandlers() {
       case "KeyC":
         camera.updateLookAt(glm.vec3.fromValues(0, 0, 0));
         break;
-    }c
+    }
   });
 
   canva.addEventListener("pointerdown", (event) => {
