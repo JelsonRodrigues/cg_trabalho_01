@@ -7,7 +7,6 @@ import { Camera } from "./Camera";
 import { F } from "./F";
 import { Pyramid } from "./Pyramid";
 import { Ground } from "./Ground";
-import { CameraCoordinates } from "./CameraCoordinates";
 import { Virus } from "./Virus";
 import { GlowKnife } from "./GlowKnife";
 import { MovingCamera } from "./MovingCamera";
@@ -30,7 +29,7 @@ var start = Date.now();
 var perspective = glm.mat4.create();
 
 function canvasResize(canva:HTMLCanvasElement) {
-  const widht = window.innerWidth;
+  const widht = window.innerWidth - 25;
   const height = window.innerHeight - 50;
   canva.width = widht;
   canva.height = height;
@@ -105,7 +104,6 @@ async function main() {
     new F(gl),
     new Pyramid(gl),
     new Ground(gl),
-    new CameraCoordinates(gl),
     new GlowKnife(gl),
     new SplinePoints(gl, spline),
   );
@@ -117,26 +115,67 @@ async function main() {
 
 var begin_movement : glm.vec2 = glm.vec2.create();
 
+var index_curve_in_spline = -1;
+var index_control_point_in_curve = -1;
+var spline_modifiyng : SplinePoints | null = null;
+
 function setupEventHandlers() {
   window.addEventListener('keydown', (event) => {
+    console.log(event.code);
     let camera = cameras[current_camera];
-    const look_at = camera.getCameraLookingAt();
+    const camera_position = camera.getCameraPosition();
+    const camera_to_look_at_vector = glm.vec3.sub(glm.vec3.create(), camera.getCameraLookingAt(), camera_position);
+    const camera_matrix = camera.getCameraMatrix();
+    let new_look_at : glm.vec3;
+    let vec_movement : glm.vec3;
     switch (event.code) {
-      case "ArrowUp": 
-        look_at[0] += 0.5;
-        camera.updateLookAt(look_at);
+      case "ArrowUp": // Translate along -z
+        vec_movement = glm.vec3.create();
+        glm.vec3.scale(vec_movement, glm.vec3.fromValues(camera_matrix[8], camera_matrix[9], camera_matrix[10]), -0.5);
+        glm.vec3.add(camera_position, camera_position, vec_movement);
+        new_look_at = glm.vec3.add(glm.vec3.create(), camera_position, camera_to_look_at_vector);
+        camera.updateCameraPosition(camera_position);
+        camera.updateLookAt(new_look_at);
         break;
-      case "ArrowDown": 
-        look_at[0] -= 0.5;
-        camera.updateLookAt(look_at);
+      case "ArrowDown": // Translate along z
+        vec_movement = glm.vec3.create();
+        glm.vec3.scale(vec_movement, glm.vec3.fromValues(camera_matrix[8], camera_matrix[9], camera_matrix[10]), 0.5);
+        glm.vec3.add(camera_position, camera_position, vec_movement);
+        new_look_at = glm.vec3.add(glm.vec3.create(), camera_position, camera_to_look_at_vector);
+        camera.updateCameraPosition(camera_position);
+        camera.updateLookAt(new_look_at);
         break;
-      case "ArrowRight": 
-        look_at[2] += 0.5;
-        camera.updateLookAt(look_at);
+      case "ArrowRight": // Translate along +x
+        vec_movement = glm.vec3.create();
+        glm.vec3.scale(vec_movement, glm.vec3.fromValues(camera_matrix[0], camera_matrix[1], camera_matrix[2]), 0.5);
+        glm.vec3.add(camera_position, camera_position, vec_movement);
+        new_look_at = glm.vec3.add(glm.vec3.create(), camera_position, camera_to_look_at_vector);
+        camera.updateCameraPosition(camera_position);
+        camera.updateLookAt(new_look_at);
         break;
-      case "ArrowLeft": 
-        look_at[2] -= 0.5;
-        camera.updateLookAt(look_at);
+      case "ArrowLeft": // Translate along -x
+        vec_movement = glm.vec3.create();
+        glm.vec3.scale(vec_movement, glm.vec3.fromValues(camera_matrix[0], camera_matrix[1], camera_matrix[2]), -0.5);
+        glm.vec3.add(camera_position, camera_position, vec_movement);
+        new_look_at = glm.vec3.add(glm.vec3.create(), camera_position, camera_to_look_at_vector);
+        camera.updateCameraPosition(camera_position);
+        camera.updateLookAt(new_look_at);
+        break;
+      case "ShiftRight": 
+        vec_movement = glm.vec3.create();
+        glm.vec3.scale(vec_movement, glm.vec3.fromValues(camera_matrix[4], camera_matrix[5], camera_matrix[6]), 0.5);
+        glm.vec3.add(camera_position, camera_position, vec_movement);
+        new_look_at = glm.vec3.add(glm.vec3.create(), camera_position, camera_to_look_at_vector);
+        camera.updateCameraPosition(camera_position);
+        camera.updateLookAt(new_look_at);
+        break;
+      case "ControlRight": 
+        vec_movement = glm.vec3.create();
+        glm.vec3.scale(vec_movement, glm.vec3.fromValues(camera_matrix[4], camera_matrix[5], camera_matrix[6]), -0.5);
+        glm.vec3.add(camera_position, camera_position, vec_movement);
+        new_look_at = glm.vec3.add(glm.vec3.create(), camera_position, camera_to_look_at_vector);
+        camera.updateCameraPosition(camera_position);
+        camera.updateLookAt(new_look_at);
         break;
       case "KeyV":
         camera = cameras[current_camera];
@@ -145,7 +184,50 @@ function setupEventHandlers() {
         camera = cameras[current_camera];
         if (camera instanceof MovingCamera) { camera.resumeAnimation(); } // Resume animation
         break;
-    }
+      case "KeyJ":
+        if (spline_modifiyng != null) {
+          spline_modifiyng = spline_modifiyng as SplinePoints;
+          spline_modifiyng.spline.turnG0Continuous();
+          spline_modifiyng.updateSplinePoints(gl);
+        }
+        break;
+      case "KeyK":
+        if (spline_modifiyng != null) {
+          spline_modifiyng = spline_modifiyng as SplinePoints;
+          spline_modifiyng.spline.turnG1Continuous();
+          spline_modifiyng.updateSplinePoints(gl);
+        }
+        break;
+      case "KeyL":
+        if (spline_modifiyng != null) {
+          spline_modifiyng = spline_modifiyng as SplinePoints;
+          spline_modifiyng.spline.turnC1Continuous();
+          spline_modifiyng.updateSplinePoints(gl);
+        }
+        break;
+      case "Semicolon":
+        if (spline_modifiyng != null) {
+          spline_modifiyng = spline_modifiyng as SplinePoints;
+          for (let i = 0; i < spline_modifiyng.spline.getNumCurvesInSpline; ++i) {
+            const curve = spline_modifiyng.spline.getCurveByIndex(i);
+            curve?.getControlPoints.forEach((point)=>{
+              console.log(point);
+            });
+          }
+        }
+        break;
+      case "KeyH":
+        if (spline_modifiyng != null) {
+          spline_modifiyng = spline_modifiyng as SplinePoints;
+          spline_modifiyng.spline.addCurve(new CubicBezierCurve([10, 10, 10], [15, 10, 10], [20, 10, 10], [25, 10, 10]));
+          spline_modifiyng.spline.sampleSpline();
+          spline_modifiyng.updateSplinePoints(gl);
+        }
+        break;
+      case "KeyC":
+        camera.updateLookAt(glm.vec3.fromValues(0, 0, 0));
+        break;
+    }c
   });
 
   canva.addEventListener("pointerdown", (event) => {
@@ -157,7 +239,6 @@ function setupEventHandlers() {
       const splines = objects.filter((object) => {
         return object instanceof SplinePoints;
       });
-      console.log(splines);
       for (let i=0; i< splines.length; ++i) {
         let spline = splines[i] as SplinePoints;
         for (let c = 0; c < spline.spline.getNumCurvesInSpline; ++c) {
@@ -171,7 +252,6 @@ function setupEventHandlers() {
             glm.vec3.transformMat4(transformed_point, point, cameras[current_camera].getViewMatrix());
             glm.vec3.transformMat4(transformed_point, transformed_point, perspective);
             
-            
             const dist_vec = glm.vec2.sub(
               glm.vec2.create(), 
               glm.vec2.fromValues((begin_movement[0] *2.0) / canva.width -1.0, (-begin_movement[1] * 2.0) / canva.height + 1.0), 
@@ -184,10 +264,14 @@ function setupEventHandlers() {
             // With the view frustum
             const dist = glm.vec2.length(dist_vec);
             const RADIUS = 0.06;
-            if (dist <= RADIUS) {
-              canva.addEventListener("pointermove", modify_spline);
-            }
 
+            if (dist <= RADIUS) {
+              spline_modifiyng = spline;
+              index_curve_in_spline = c;
+              index_control_point_in_curve = j;
+              canva.addEventListener("pointermove", modify_spline);
+              return;
+            }
           }
         }
       }
@@ -203,6 +287,7 @@ function setupEventHandlers() {
   canva.addEventListener("pointerup", (event) => {
     if (event.button == 0) {
       canva.removeEventListener("pointermove", orbit_camera_with_mouse);
+      canva.removeEventListener("pointermove", modify_spline);
     }
     else if (event.button == 2) {
       canva.removeEventListener("pointermove", move_camera_with_mouse);
@@ -232,7 +317,38 @@ function setupEventHandlers() {
   });
 
   const modify_spline = (event: PointerEvent) => {
-    // TODO CODE
+    const current_position = glm.vec2.fromValues(event.clientX, event.clientY);
+    const change = glm.vec2.create();
+    glm.vec2.sub(change, current_position, begin_movement);
+    
+    if (spline_modifiyng == null) { return; }
+    spline_modifiyng = spline_modifiyng as SplinePoints;
+    const spline = spline_modifiyng.spline;
+    const curve = spline.getCurveByIndex(index_curve_in_spline) as CubicBezierCurve;
+    const point = curve.getControlPointByIndex(index_control_point_in_curve) as glm.vec3;
+
+    const camera_position_in_world = cameras[current_camera].getCameraPosition();
+    const camera_to_point_vec = glm.vec3.sub(glm.vec3.create(), point, camera_position_in_world);
+
+    const camera_matrix = cameras[current_camera].getCameraMatrix();
+
+    const y_axis_transformed = glm.vec3.fromValues(camera_matrix[4], camera_matrix[5], camera_matrix[6]);
+
+    const rotation_arround_y = glm.mat4.create();
+    glm.mat4.rotate(rotation_arround_y, rotation_arround_y, change[0] * -0.0025, y_axis_transformed);
+    glm.vec3.transformMat4(camera_to_point_vec, camera_to_point_vec, rotation_arround_y);
+
+    const x_axis_transformed = glm.vec3.fromValues(camera_matrix[0], camera_matrix[1], camera_matrix[2]);
+    const rotation_arround_x = glm.mat4.create();
+    glm.mat4.rotate(rotation_arround_x, rotation_arround_x, change[1] * -0.0025, x_axis_transformed);
+    glm.vec3.transformMat4(camera_to_point_vec, camera_to_point_vec, rotation_arround_x);
+
+    const new_point = glm.vec3.add(glm.vec3.create(), camera_position_in_world, camera_to_point_vec);
+    curve.changeControlPoint(index_control_point_in_curve, new_point);
+    spline.updateCurve(index_curve_in_spline, curve);
+    spline_modifiyng.updateSplinePoints(gl);
+
+    begin_movement = glm.vec2.clone(current_position);
   }
 
   const orbit_camera_with_mouse = (event: PointerEvent) => {
@@ -307,91 +423,9 @@ function animateTiangle() {
 
   gl.clear(WebGL2RenderingContext.COLOR_BUFFER_BIT);
   objects.forEach((drawable_obj) => {
-    if (drawable_obj instanceof CameraCoordinates) {
-      const x = glm.vec3.create();
-      const y = glm.vec3.create();
-      const z = glm.vec3.create();
-
-      const view_without_translation = glm.mat3.fromValues(
-        view_matrix[0], view_matrix[1], view_matrix[2],
-        view_matrix[4], view_matrix[5], view_matrix[6],
-        view_matrix[8], view_matrix[9], view_matrix[10],
-      );
-
-      glm.vec3.transformMat3(x, [1, 0, 0], view_without_translation);
-      glm.vec3.transformMat3(y, [0, 1, 0], view_without_translation);
-      glm.vec3.transformMat3(z, [0, 0, 1], view_without_translation);
-
-      drawable_obj.UpdatePoints(gl, 
-        [x[0], x[1], x[2]],
-        [y[0], y[1], y[2]],
-        [z[0], z[1], z[2]],
-        );
-        drawable_obj.draw(gl, view_matrix, perspective);
-    }
-    else if (drawable_obj instanceof Virus) {
-      drawable_obj.draw(gl, view_matrix, perspective);
-      // const model_copy = glm.mat4.clone(drawable_obj.model);
-      // const model_copy_original = glm.mat4.clone(drawable_obj.model);
-
-      // const rotation = glm.mat4.create();
-      // glm.mat4.rotateZ(rotation, rotation, angle)
-      // glm.mat4.multiply(model_copy, model_copy, rotation);
-      // drawable_obj.model = model_copy;
-      // drawable_obj.draw(gl, view_matrix, perspective);
-
-      // for (let i = 0; i < 3; ++i) {
-      //   const model = glm.mat4.clone(drawable_obj.model);
-      //   glm.mat4.translate(model, model, [50, 15, 0]);
-      //   const rotation = glm.mat4.create();
-      //   glm.mat4.rotateY(rotation, rotation, angle + Math.PI / (i+1));
-      //   glm.mat4.multiply(model, model, rotation);
-
-      //   drawable_obj.model = model;
-      //   drawable_obj.draw(gl, view_matrix, perspective);
-      // }
-      
-      // // Undo any modification
-      // drawable_obj.model = model_copy_original;
-      // glm.mat4.translate(drawable_obj.model, drawable_obj.model, [Math.cos(angle), Math.sin(angle)/4.0, 0]);
-    }
-    // else if (drawable_obj instanceof F){
-    //   const model = glm.mat4.clone(drawable_obj.model);
-    //   const rotation = glm.mat4.create();
-    //   glm.mat4.rotateY(rotation, rotation, angle * 2);
-    //   glm.mat4.multiply(drawable_obj.model, drawable_obj.model, rotation);
-    //   drawable_obj.draw(gl, view_matrix, perspective);
-    //   drawable_obj.model = glm.mat4.clone(model);
-    // }
-    // else if (drawable_obj instanceof GlowKnife) {
-    //   const model = glm.mat4.clone(drawable_obj.model);
-
-    //   drawable_obj.model[12] += Math.sin(angle) * 6;
-    //   drawable_obj.model[14] += Math.sin(-angle) * 6;
-    //   drawable_obj.draw(gl, view_matrix, perspective);
-
-    //   drawable_obj.model = model;
-    // }
-    // else if (drawable_obj instanceof Pyramid) {
-    //   // Make so that the pyramid is always facing the camera
-    //   const model = glm.mat4.clone(drawable_obj.model);
-    //   const camera_matrix = camera.getCameraMatrix();
-    //   const lookAt = new Camera(
-    //     glm.vec3.fromValues(drawable_obj.model[12], drawable_obj.model[13], drawable_obj.model[14]),
-    //     glm.vec3.fromValues(camera_matrix[12], camera_matrix[13], camera_matrix[14]),
-    //     glm.vec3.fromValues(0, 1, 0),
-    //     );
-    //   const make_look = lookAt.getCameraMatrix();
-
-    //   glm.mat4.multiply(drawable_obj.model, make_look, drawable_obj.model);
-    //   drawable_obj.draw(gl_handler.gl, view_matrix, perspective);
-
-    //   drawable_obj.model = glm.mat4.clone(model);
-    // }
-    else {
       drawable_obj.draw(gl, view_matrix, perspective);
     }
-  });
+  );
   
   requestAnimationFrame(animateTiangle);
 }
