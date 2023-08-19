@@ -10,6 +10,7 @@ import { AnimatedObject } from "./AnimatedObject";
 export class Virus implements DrawableObject, AnimatedObject {
   public model : glm.mat4;
   private time_total : number = 10_000 * Math.random() + 5_000;
+  private roation_axis : glm.vec3 = glm.vec3.fromValues(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
   private accumulated_time : number = 0;
   private paused_animation : boolean = false;
   private z_radius : number = Math.random() * 10;
@@ -32,7 +33,7 @@ export class Virus implements DrawableObject, AnimatedObject {
 
   constructor (gl : WebGL2RenderingContext) {
     this.model = glm.mat4.create();
-    glm.mat4.scale(this.model, this.model, [1/15.0, 1/15.0, 1/15.0]);
+    glm.mat4.scale(this.model, this.model, [1/25.0, 1/25.0, 1/25.0]);
     
     // This will be done just for the first object of this class
     // All the next will reuse the information about the buffers and how to draw them
@@ -48,10 +49,13 @@ export class Virus implements DrawableObject, AnimatedObject {
   updateAnimation(fElapsedTime:number): void {
     if (!this.paused_animation) {
       if (this.accumulated_time + fElapsedTime >= this.time_total) {
-        this.x_radius += (Math.random() *2.0 - 1.0);
+        // this.x_radius += (Math.random() *2.0 - 1.0);
       }
       this.accumulated_time = (this.accumulated_time + fElapsedTime) % this.time_total;
       const percent_animation = this.accumulated_time / this.time_total;
+      
+      glm.mat4.rotate(this.model, this.model, 0.001 * fElapsedTime, this.roation_axis);
+
       this.model[12] = Math.cos(2 * Math.PI * percent_animation * this.rotation_orientation) * this.x_radius ;
       this.model[13] = this.y_radius;
       this.model[14] = Math.sin(2 * Math.PI * percent_animation * this.rotation_orientation) * this.z_radius ;
@@ -168,32 +172,62 @@ export class Virus implements DrawableObject, AnimatedObject {
     gl.bindVertexArray(null);
     
     WebGLUtils.readObj("./objects/Virus/Coronavirus_Lowpoly.obj").then(
-      ([vertexArray, vertexTextCoordArray, vertexNormalArray, 
-        vertexIndexArray, vertexIndexTextCoordArray, vertexIndexNormalArray]) => {
-          const packed_data = new Float32Array(vertexIndexArray.length * 8);
+      (obj_result) => {
+        const packed_data = new Float32Array(obj_result.index_vertices.length * 8);
 
-          for (let i = 0; i < vertexIndexArray.length; ++i) {
-            packed_data[i*8 + 0] = vertexArray[vertexIndexArray[i] * 3 + 0]; 
-            packed_data[i*8 + 1] = vertexArray[vertexIndexArray[i] * 3 + 1];  
-            packed_data[i*8 + 2] = vertexArray[vertexIndexArray[i] * 3 + 2]; 
+        for (let i = 0; i < obj_result.index_vertices.length; ++i) {
+          const vertex = obj_result.vertices[obj_result.index_vertices[i]];
+          const normal = obj_result.normals[obj_result.index_normals[i]];
+          const texture_cordinates = obj_result.texture_cordinates[obj_result.index_texture_cordinates[i]];
 
-            packed_data[i*8 + 3] = vertexNormalArray[vertexIndexNormalArray[i] * 3 + 0];
-            packed_data[i*8 + 4] = vertexNormalArray[vertexIndexNormalArray[i] * 3 + 1];
-            packed_data[i*8 + 5] = vertexNormalArray[vertexIndexNormalArray[i] * 3 + 2];
+          packed_data[i*8 + 0] = vertex[0]; 
+          packed_data[i*8 + 1] = vertex[1];  
+          packed_data[i*8 + 2] = vertex[2]; 
 
-            packed_data[i*8 + 6] = vertexTextCoordArray[vertexIndexTextCoordArray[i] * 2 + 0];
-            packed_data[i*8 + 7] = vertexTextCoordArray[vertexIndexTextCoordArray[i] * 2 + 1];
-          }
+          packed_data[i*8 + 3] = normal[0];
+          packed_data[i*8 + 4] = normal[1];
+          packed_data[i*8 + 5] = normal[2];
 
-          gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, Virus.buffer_vertices);
-          gl.bufferData(
-            WebGL2RenderingContext.ARRAY_BUFFER,
-            packed_data,
-            WebGL2RenderingContext.STATIC_DRAW
-          );
-
-          Virus.vertices = vertexIndexArray.length;
+          packed_data[i*8 + 6] = texture_cordinates[0];
+          packed_data[i*8 + 7] = texture_cordinates[1];
         }
+
+        gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, Virus.buffer_vertices);
+        gl.bufferData(
+          WebGL2RenderingContext.ARRAY_BUFFER,
+          packed_data,
+          WebGL2RenderingContext.STATIC_DRAW
+        );
+
+        Virus.vertices = obj_result.index_vertices.length;
+      }
+      
+      // ([vertexArray, vertexTextCoordArray, vertexNormalArray, 
+      //   vertexIndexArray, vertexIndexTextCoordArray, vertexIndexNormalArray]) => {
+      //     const packed_data = new Float32Array(vertexIndexArray.length * 8);
+
+      //     for (let i = 0; i < vertexIndexArray.length; ++i) {
+      //       packed_data[i*8 + 0] = vertexArray[vertexIndexArray[i] * 3 + 0]; 
+      //       packed_data[i*8 + 1] = vertexArray[vertexIndexArray[i] * 3 + 1];  
+      //       packed_data[i*8 + 2] = vertexArray[vertexIndexArray[i] * 3 + 2]; 
+
+      //       packed_data[i*8 + 3] = vertexNormalArray[vertexIndexNormalArray[i] * 3 + 0];
+      //       packed_data[i*8 + 4] = vertexNormalArray[vertexIndexNormalArray[i] * 3 + 1];
+      //       packed_data[i*8 + 5] = vertexNormalArray[vertexIndexNormalArray[i] * 3 + 2];
+
+      //       packed_data[i*8 + 6] = vertexTextCoordArray[vertexIndexTextCoordArray[i] * 2 + 0];
+      //       packed_data[i*8 + 7] = vertexTextCoordArray[vertexIndexTextCoordArray[i] * 2 + 1];
+      //     }
+
+      //     gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, Virus.buffer_vertices);
+      //     gl.bufferData(
+      //       WebGL2RenderingContext.ARRAY_BUFFER,
+      //       packed_data,
+      //       WebGL2RenderingContext.STATIC_DRAW
+      //     );
+
+      //     Virus.vertices = vertexIndexArray.length;
+      //   }
     );
 
     // Read the texture

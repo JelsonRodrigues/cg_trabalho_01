@@ -129,35 +129,38 @@ export class GlowKnife implements DrawableObject {
     // Unbind VAO buffer so other objects cannot modify it
     gl.bindVertexArray(null);
   
-    const data = WebGLUtils.readObj("./objects/GlowKnife/Glow_Knife.obj").then(
-      ([vertexArray, vertexTextCoordArray, vertexNormalArray, 
-        vertexIndexArray, vertexIndexTextCoordArray, vertexIndexNormalArray]) => {
-          const packed_data = new Float32Array(vertexIndexArray.length * 8);
+    WebGLUtils.readObj("./objects/GlowKnife/Glow_Knife.obj").then(
+      (obj_result) => {
+        const packed_data = new Float32Array(obj_result.index_vertices.length * 8);
 
-          for (let i = 0; i < vertexIndexArray.length; ++i) {
-            packed_data[i*8 + 0] = vertexArray[vertexIndexArray[i] * 3 + 0]; 
-            packed_data[i*8 + 1] = vertexArray[vertexIndexArray[i] * 3 + 1];  
-            packed_data[i*8 + 2] = vertexArray[vertexIndexArray[i] * 3 + 2]; 
+        for (let i = 0; i < obj_result.index_vertices.length; ++i) {
+          const vertex = obj_result.vertices[obj_result.index_vertices[i]];
+          const normal = obj_result.normals[obj_result.index_normals[i]];
+          const texture_cordinates = obj_result.texture_cordinates[obj_result.index_texture_cordinates[i]];
 
-            packed_data[i*8 + 3] = vertexNormalArray[vertexIndexNormalArray[i] * 3 + 0];
-            packed_data[i*8 + 4] = vertexNormalArray[vertexIndexNormalArray[i] * 3 + 1];
-            packed_data[i*8 + 5] = vertexNormalArray[vertexIndexNormalArray[i] * 3 + 2];
+          packed_data[i*8 + 0] = vertex[0]; 
+          packed_data[i*8 + 1] = vertex[1];  
+          packed_data[i*8 + 2] = vertex[2]; 
 
-            packed_data[i*8 + 6] = vertexTextCoordArray[vertexIndexTextCoordArray[i] * 2 + 0];
-            packed_data[i*8 + 7] = vertexTextCoordArray[vertexIndexTextCoordArray[i] * 2 + 1];
-          }
+          packed_data[i*8 + 3] = normal[0];
+          packed_data[i*8 + 4] = normal[1];
+          packed_data[i*8 + 5] = normal[2];
 
-          gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, GlowKnife.buffer_vertices);
-          gl.bufferData(
-            WebGL2RenderingContext.ARRAY_BUFFER,
-            packed_data,
-            WebGL2RenderingContext.STATIC_DRAW
-          );
-
-          GlowKnife.vertices = vertexIndexArray.length;
+          packed_data[i*8 + 6] = texture_cordinates[0];
+          packed_data[i*8 + 7] = texture_cordinates[1];
         }
+
+        gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, GlowKnife.buffer_vertices);
+        gl.bufferData(
+          WebGL2RenderingContext.ARRAY_BUFFER,
+          packed_data,
+          WebGL2RenderingContext.STATIC_DRAW
+        );
+
+        GlowKnife.vertices = obj_result.index_vertices.length;
+      }
     );
-    
+
     // Read the texture
     fetch("objects/GlowKnife/Glow_Knife_Texture.png")
     .then(response => response.blob())
