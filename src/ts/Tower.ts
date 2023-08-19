@@ -24,6 +24,7 @@ export class Tower implements DrawableObject {
   private static texture_floor_uv1_albedo : WebGLTexture;
   private static texture_grass_albedo : WebGLTexture;
   private static texture_home_uv3_albedo : WebGLTexture;
+  private static texture_emissive : WebGLTexture;
 
   constructor (gl : WebGL2RenderingContext) {
     this.model = glm.mat4.create();
@@ -59,6 +60,9 @@ export class Tower implements DrawableObject {
             break;
           case "grass":
             gl.bindTexture(WebGL2RenderingContext.TEXTURE_2D, Tower.texture_grass_albedo);
+            break;
+          case "window":
+            gl.bindTexture(WebGL2RenderingContext.TEXTURE_2D, Tower.texture_emissive);
             break;
         }
         gl.drawArrays(WebGL2RenderingContext.TRIANGLES, key[0], key[1]);
@@ -145,6 +149,20 @@ export class Tower implements DrawableObject {
       WebGL2RenderingContext.RGBA, 
       WebGL2RenderingContext.UNSIGNED_BYTE, 
       new Uint8Array([128, 128, 0, 255])
+    );
+
+    Tower.texture_emissive = gl.createTexture() as WebGLTexture;
+    gl.bindTexture(WebGL2RenderingContext.TEXTURE_2D, Tower.texture_emissive);
+    gl.texImage2D(
+      WebGL2RenderingContext.TEXTURE_2D, 
+      0, 
+      WebGL2RenderingContext.RGBA, 
+      1, 
+      1, 
+      0, 
+      WebGL2RenderingContext.RGBA, 
+      WebGL2RenderingContext.UNSIGNED_BYTE, 
+      new Uint8Array([128, 255, 0, 255])
     );
 
     // Create the Vertex Array Object
@@ -266,6 +284,18 @@ export class Tower implements DrawableObject {
       const image = new Image();
       image.onload = () => {
         gl.bindTexture(WebGL2RenderingContext.TEXTURE_2D, Tower.texture_home_uv3_albedo);
+        gl.texImage2D(WebGL2RenderingContext.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        gl.generateMipmap(gl.TEXTURE_2D);
+      };
+      image.src = URL.createObjectURL(blob);
+    });
+
+    fetch("objects/Tower/Textures/emissive.jpeg")
+    .then(response => response.blob())
+    .then(blob => {
+      const image = new Image();
+      image.onload = () => {
+        gl.bindTexture(WebGL2RenderingContext.TEXTURE_2D, Tower.texture_emissive);
         gl.texImage2D(WebGL2RenderingContext.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
         gl.generateMipmap(gl.TEXTURE_2D);
       };
