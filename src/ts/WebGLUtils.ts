@@ -162,6 +162,7 @@ export module WebGLUtils {
     // The range of indices to use a certain material information
     // Maps a range of vertices to a material information
     objects_ranges : Map<[number, number], MTL_Info>;
+
   }
   export async function readObj(filePath:string) : Promise<OBJ_Info> {
     const obj_content = await readFile(filePath);
@@ -176,10 +177,9 @@ export module WebGLUtils {
       "objects_ranges" : new Map(),
     };
 
-    // const local_ranges = new Map<[number, number], string>();
     const mtl_libraries : Array<Map<string, MTL_Info>> = new Array<Map<string, MTL_Info>>();
 
-    let last_material_used = "";
+    let last_material_used : string = "";
     let vertex_index_counter = 0;
     let vertex_index_start = 0;
 
