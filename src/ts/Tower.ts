@@ -242,7 +242,7 @@ export class Tower implements DrawableObject {
     );
 
     // Read the textures
-    fetch("objects/Tower/Textures/albedo.jpeg")
+    fetch("objects/Tower/textures/albedo.jpeg")
     .then(response => response.blob())
     .then(blob => {
       const image = new Image();
@@ -254,7 +254,7 @@ export class Tower implements DrawableObject {
       image.src = URL.createObjectURL(blob);
     });
 
-    fetch("objects/Tower/Textures/floor_uv1_albedo.jpeg")
+    fetch("objects/Tower/textures/floor_uv1_albedo.jpeg")
     .then(response => response.blob())
     .then(blob => {
       const image = new Image();
@@ -266,7 +266,7 @@ export class Tower implements DrawableObject {
       image.src = URL.createObjectURL(blob);
     });
 
-    fetch("objects/Tower/Textures/grass_albedo.jpeg")
+    fetch("objects/Tower/textures/grass_albedo.jpeg")
     .then(response => response.blob())
     .then(blob => {
       const image = new Image();
@@ -278,7 +278,7 @@ export class Tower implements DrawableObject {
       image.src = URL.createObjectURL(blob);
     });
 
-    fetch("objects/Tower/Textures/home_uv3_albedo.jpeg")
+    fetch("objects/Tower/textures/home_uv3_albedo.jpeg")
     .then(response => response.blob())
     .then(blob => {
       const image = new Image();
@@ -290,7 +290,7 @@ export class Tower implements DrawableObject {
       image.src = URL.createObjectURL(blob);
     });
 
-    fetch("objects/Tower/Textures/emissive.jpeg")
+    fetch("objects/Tower/textures/emissive.jpeg")
     .then(response => response.blob())
     .then(blob => {
       const image = new Image();

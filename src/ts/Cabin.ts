@@ -250,7 +250,7 @@ export class Cabin implements DrawableObject {
     );
 
     // Read the textures
-    fetch("objects/Cabin/Textures/bark_willow_diff_4k.jpg")
+    fetch("objects/Cabin/textures/bark_willow_diff_4k.jpg")
     .then(response => response.blob())
     .then(blob => {
       const image = new Image();
@@ -262,7 +262,7 @@ export class Cabin implements DrawableObject {
       image.src = URL.createObjectURL(blob);
     });
 
-    fetch("objects/Cabin/Textures/reed_roof_04_diff_4k.jpg")
+    fetch("objects/Cabin/textures/reed_roof_04_diff_4k.jpg")
     .then(response => response.blob())
     .then(blob => {
       const image = new Image();
@@ -274,7 +274,7 @@ export class Cabin implements DrawableObject {
       image.src = URL.createObjectURL(blob);
     });
 
-    fetch("objects/Cabin/Textures/rough_wood_diff_4k.jpg")
+    fetch("objects/Cabin/textures/rough_wood_diff_4k.jpg")
     .then(response => response.blob())
     .then(blob => {
       const image = new Image();
