@@ -380,8 +380,6 @@ async function main() {
     objects.push(virus);
     animated_objects.push(virus);
   }
-  
-  await WebGLUtils.sleep(500);
 
   const virus_to_awm_follow = new Virus(gl, [ -25, 6, 10 ]);
   virus_to_awm_follow.time_total = 3000;
@@ -396,12 +394,10 @@ async function main() {
   animated_objects.push(awm);
   animated_objects.push(awm2);
 
-
   const tower1 = new Tower(gl);
   const tower2 = new Tower(gl);
   glm.mat4.translate(tower2.model, tower2.model, [10, -0.1, 10]);
   
-
   const knife = new GlowKnife(gl);
   knife.model = glm.mat4.create();
   glm.mat4.translate(knife.model, knife.model, [35, 0, -40]);
