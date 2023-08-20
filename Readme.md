@@ -11,6 +11,10 @@ node src/server/server.js
 ```
 Now you can just open your browser in [http://localhost:3000](http://localhost:3000)
 
+# Demo
+
+https://github.com/JelsonRodrigues/cg_trabalho_01/assets/88675696/5d013193-4fa7-429a-8a8c-aa4ec3bf807b
+
 # Commands
 **v** Cycle through the cameras <br>
 **c** Center view to origin of the world (look_at = [0, 0, 0]) <br>
