@@ -6,25 +6,29 @@ import * as glm from "gl-matrix";
 
 export class MovingCamera extends Camera implements AnimatedObject {
   private camera_path : Spline;
-  private camera_loking_at_path : Spline;
+  private camera_loking_at_path : Spline | null;
   private time_total : number = 10_000;
   private accumulated_time : number = 0;
   private paused_animation : boolean = false;
 
-  constructor (up_vector: glm.vec3, camera_path:Spline, camera_loking_at_path : Spline, time_complete_path_ms:number) {
+  constructor (up_vector: glm.vec3, camera_path:Spline, time_complete_path_ms:number, camera_loking_at_path : Spline | null = null) {
     super(camera_path.getPoint(0.0), camera_path.getPointTangent(0.0), up_vector);
     this.camera_path = camera_path;
     this.camera_loking_at_path = camera_loking_at_path;
     this.time_total = time_complete_path_ms;
   }
   
-
   updateAnimation(fElapsedTime:number): void {
     if (!this.paused_animation) {
       this.accumulated_time = (this.accumulated_time + fElapsedTime) % this.time_total;
       const percent_animation = this.accumulated_time / this.time_total;
       super.updateCameraPosition(this.camera_path.getPoint(percent_animation));
-      super.updateLookAt(this.camera_loking_at_path.getPoint(percent_animation));
+      if (this.camera_loking_at_path != null) {
+        super.updateLookAt(this.camera_loking_at_path.getPoint(percent_animation));
+      }
+      else {
+        super.updateLookAt(this.camera_path.getPointTangent(percent_animation));
+      }
     }
   }
 

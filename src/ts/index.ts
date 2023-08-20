@@ -15,6 +15,7 @@ import { MovingCamera } from "./MovingCamera";
 import { SplinePoints } from "./SplinePoints";
 import { AnimatedObject } from "./AnimatedObject";
 import { Cabin } from "./Cabin";
+import WebGLUtils from "./WebGLUtils";
 
 var canva : HTMLCanvasElement;
 var gl : WebGL2RenderingContext;
@@ -125,7 +126,7 @@ async function main() {
     )
   );
   
-  const moving_camera = new MovingCamera([0, 1, 0], spline, spline_camera_look, 15000);
+  const moving_camera = new MovingCamera([0, 1, 0], spline, 15000, spline_camera_look);
   
   cameras.push(
     new Camera([15, 10, 0], [0, 0, 0], [0, 1, 0]),
@@ -139,6 +140,8 @@ async function main() {
     objects.push(virus);
     animated_objects.push(virus);
   }
+  
+  await WebGLUtils.sleep(500);
 
   const virus_to_awm_follow = new Virus(gl, [ -25, 6, 10 ]);
   virus_to_awm_follow.time_total = 3000;
@@ -146,22 +149,29 @@ async function main() {
   objects.push(virus_to_awm_follow);
   animated_objects.push(virus_to_awm_follow);
   const awm = new AWM(gl, virus_to_awm_follow);
+  glm.mat4.translate(awm.model, awm.model, [-8, 9, 3]);
   const awm2 = new AWM(gl, virus_to_awm_follow);
   awm2.model[12] -= 25;
   awm2.model[14] += 5;
   animated_objects.push(awm);
   animated_objects.push(awm2);
 
+
+  const tower1 = new Tower(gl);
+  const tower2 = new Tower(gl);
+  glm.mat4.translate(tower2.model, tower2.model, [10, -0.1, 10]);
+  
   objects.push(
     // new F(gl),
     // new Pyramid(gl),
     // new Ground(gl),
     new GlowKnife(gl),
-    // new SplinePoints(gl, spline),
-    new Tower(gl),
+    tower1,
+    tower2,
     new Cabin(gl),
     awm,
     awm2,
+    new SplinePoints(gl, spline),
   );
 
   setupEventHandlers();
@@ -174,6 +184,7 @@ var begin_movement : glm.vec2 = glm.vec2.create();
 var index_curve_in_spline = -1;
 var index_control_point_in_curve = -1;
 var spline_modifiyng : SplinePoints | null = null;
+var left_control_pressed = false;
 
 function setupEventHandlers() {
   window.addEventListener('keydown', (event) => {
@@ -232,6 +243,9 @@ function setupEventHandlers() {
         camera.updateCameraPosition(camera_position);
         camera.updateLookAt(new_look_at);
         break;
+      case "ControlLeft": 
+        left_control_pressed = true;
+        break;
       case "KeyV":
         camera = cameras[current_camera];
         if (camera instanceof MovingCamera) { camera.pauseAnimation(); } // Pause animation
@@ -282,6 +296,14 @@ function setupEventHandlers() {
       case "KeyC":
         camera.updateLookAt(glm.vec3.fromValues(0, 0, 0));
         break;
+    }
+  });
+
+  window.addEventListener("keyup", (event) => {
+    switch (event.code){
+    case "ControlLeft": 
+      left_control_pressed = false;
+      break;
     }
   });
 
@@ -387,16 +409,19 @@ function setupEventHandlers() {
 
     const camera_matrix = cameras[current_camera].getCameraMatrix();
 
-    const y_axis_transformed = glm.vec3.fromValues(camera_matrix[4], camera_matrix[5], camera_matrix[6]);
-
-    const rotation_arround_y = glm.mat4.create();
-    glm.mat4.rotate(rotation_arround_y, rotation_arround_y, change[0] * -0.0025, y_axis_transformed);
-    glm.vec3.transformMat4(camera_to_point_vec, camera_to_point_vec, rotation_arround_y);
-
-    const x_axis_transformed = glm.vec3.fromValues(camera_matrix[0], camera_matrix[1], camera_matrix[2]);
-    const rotation_arround_x = glm.mat4.create();
-    glm.mat4.rotate(rotation_arround_x, rotation_arround_x, change[1] * -0.0025, x_axis_transformed);
-    glm.vec3.transformMat4(camera_to_point_vec, camera_to_point_vec, rotation_arround_x);
+    if (left_control_pressed) {
+      const y_axis_transformed = glm.vec3.fromValues(camera_matrix[4], camera_matrix[5], camera_matrix[6]);
+      const dot_value = glm.vec3.dot([0, 1, 0], y_axis_transformed);
+      glm.vec3.scaleAndAdd(camera_to_point_vec, camera_to_point_vec, [0, 1, 0], change[1]* 0.1 * (dot_value > 0 ? -1 : 1));
+    }
+    else {
+      const z_axis_transformed = glm.vec3.fromValues(camera_matrix[8], 0, camera_matrix[10]);
+      const z_norm = glm.vec3.normalize(glm.vec3.create(), z_axis_transformed);
+      glm.vec3.scaleAndAdd(camera_to_point_vec, camera_to_point_vec, z_norm, change[1] * 0.1);
+    }
+    const x_axis_transformed = glm.vec3.fromValues(camera_matrix[0], 0, camera_matrix[2]);
+    const x_norm = glm.vec3.normalize(glm.vec3.create(), x_axis_transformed);
+    glm.vec3.scaleAndAdd(camera_to_point_vec, camera_to_point_vec, x_norm, change[0] * 0.1);
 
     const new_point = glm.vec3.add(glm.vec3.create(), camera_position_in_world, camera_to_point_vec);
     curve.changeControlPoint(index_control_point_in_curve, new_point);

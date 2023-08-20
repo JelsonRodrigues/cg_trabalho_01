@@ -26,8 +26,9 @@ export class Cabin implements DrawableObject {
 
   constructor (gl : WebGL2RenderingContext) {
     this.model = glm.mat4.create();
-    glm.mat4.translate(this.model, this.model, [25, 0, -35]);
     glm.mat4.rotate(this.model, this.model, -Math.PI / 5, [0, 1, 0]);
+    glm.mat4.translate(this.model, this.model, [16, 0, -51]);
+    glm.mat4.scale(this.model, this.model, [1.25, 1.25, 1.25]);
 
     if (!Cabin.initialized){
       this.setup(gl);

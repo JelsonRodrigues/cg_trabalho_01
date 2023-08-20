@@ -64,7 +64,7 @@ export class SplinePoints implements DrawableObject {
     gl.uniformMatrix4fv(SplinePoints.u_model, false, this.model);
     gl.uniformMatrix4fv(SplinePoints.u_view, false, view);
     gl.uniformMatrix4fv(SplinePoints.u_projection, false, projection);
-    gl.uniform4f(SplinePoints.u_color, 0.1, 0.1, 0.1, 1.0);
+    gl.uniform4f(SplinePoints.u_color, 0.25, 0.25, 0.3, 1.0);
     
     gl.drawArrays(WebGL2RenderingContext.LINES, 0, this.spline.getNumCurvesInSpline * 4);
     gl.drawArrays(WebGL2RenderingContext.POINTS, 0, this.spline.getNumCurvesInSpline * 4);
