@@ -27,7 +27,7 @@ var cameras : Array<Camera> = new Array();
 var current_camera : number = 0;
 
 // Animation
-var full_rotation = 10000;
+var animation_slider : HTMLInputElement;
 var start = Date.now();
 
 var perspective = glm.mat4.create();
@@ -42,6 +42,9 @@ function canvasResize(canva:HTMLCanvasElement) {
 }
 
 async function main() {
+  // Get the slider
+  animation_slider = document.getElementById("animationSlider") as HTMLInputElement;
+
   // Get canvas
   canva = document.getElementById("mainCanvas") as HTMLCanvasElement;
   canvasResize(canva);
@@ -366,7 +369,7 @@ async function main() {
   [43.84132385253906, 11.450017929077148, -30.126686096191406]
   ));
   
-  const moving_camera = new MovingCamera([0, 1, 0], spline, 60000, spline_camera_look);
+  const moving_camera = new MovingCamera([0, 1, 0], spline, 60000, spline_camera_look, animation_slider);
 
   cameras.push(
     new Camera([15, 10, 0], [0, 0, 0], [0, 1, 0]),
@@ -420,7 +423,7 @@ async function main() {
 
   setupEventHandlers();
   start = Date.now();
-  animateTiangle();
+  animate();
 }
 
 var begin_movement : glm.vec2 = glm.vec2.create();
@@ -431,6 +434,18 @@ var spline_modifiyng : SplinePoints | null = null;
 var left_control_pressed = false;
 
 function setupEventHandlers() {
+  // play button
+  const button = document.getElementById("playButton") as HTMLButtonElement
+  button.addEventListener("click", (event) => {
+    current_camera = 1;
+    animated_objects.forEach(
+      (object) => {
+        object.resetAnimation();
+        object.resumeAnimation();
+      }
+    );
+  });
+
   window.addEventListener('keydown', (event) => {
     let camera = cameras[current_camera];
     const camera_position = camera.getCameraPosition();
@@ -750,7 +765,7 @@ function setupEventHandlers() {
 }
 
 
-function animateTiangle() {
+function animate() {
 
   updateAnimation();
   // Create model matrix
@@ -766,7 +781,7 @@ function animateTiangle() {
     }
   );
   
-  requestAnimationFrame(animateTiangle);
+  requestAnimationFrame(animate);
 }
 
 var before:number = 0;
