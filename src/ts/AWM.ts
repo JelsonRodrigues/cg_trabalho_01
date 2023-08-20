@@ -20,6 +20,7 @@ export class AWM implements DrawableObject, AnimatedObject {
   private static u_model : WebGLUniformLocation;
   private static u_view : WebGLUniformLocation;
   private static u_projection : WebGLUniformLocation;
+  private static u_light_position : WebGLUniformLocation;
   private static a_position : number;
   private static a_normal : number;
   private static a_text_coord : number;
@@ -83,6 +84,7 @@ export class AWM implements DrawableObject, AnimatedObject {
     gl.uniformMatrix4fv(AWM.u_model, false, this.model);
     gl.uniformMatrix4fv(AWM.u_view, false, view);
     gl.uniformMatrix4fv(AWM.u_projection, false, projection);
+    gl.uniform3f(AWM.u_light_position, 0.707, 0.707, 0.0);
 
     AWM.objects_mtl_ranges.forEach(
       (value, key) => {
@@ -133,7 +135,8 @@ export class AWM implements DrawableObject, AnimatedObject {
     AWM.u_model = gl.getUniformLocation(AWM.program, "model") as WebGLUniformLocation;
     AWM.u_view = gl.getUniformLocation(AWM.program, "view") as WebGLUniformLocation;
     AWM.u_projection = gl.getUniformLocation(AWM.program, "projection") as WebGLUniformLocation;
-    
+    AWM.u_light_position = gl.getUniformLocation(AWM.program, "u_light_position") as WebGLUniformLocation;
+
     AWM.a_position = gl.getAttribLocation(AWM.program, "position");
     AWM.a_normal = gl.getAttribLocation(AWM.program, "normal");
     AWM.a_text_coord = gl.getAttribLocation(AWM.program, "text_coord");

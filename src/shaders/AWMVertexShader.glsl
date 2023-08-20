@@ -4,11 +4,11 @@ precision highp float;
 
 // Vertex attributes
 layout( location=0 ) in vec4 position;
-layout( location=1 ) in vec4 normal;
+layout( location=1 ) in vec3 normal;
 layout( location=2 ) in vec2 text_coord;
 
 out vec2 f_text_coord;
-out vec4 f_normal;
+out vec3 f_normal;
 
 // Aplica perspectiva para os pontos
 uniform mat4x4 projection;
@@ -23,5 +23,5 @@ uniform mat4x4 model;
 void main() {
   gl_Position = projection * view * model * position;
   f_text_coord = text_coord;
-  f_normal = normal;
+  f_normal = mat3(transpose(inverse(model))) * normal;
 }
