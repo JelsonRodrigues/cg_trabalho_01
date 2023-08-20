@@ -9,6 +9,20 @@ tsc
 npx webpack
 node src/server/server.js
 ```
+Now you can just open your browser in [http://localhost:3000](http://localhost:3000)
+
+# Commands
+**v** Cycle through the cameras <br>
+**c** Center view to origin of the world (look_at = [0, 0, 0]) <br>
+**left click** Orbit camera with mouse <br>
+**midlle click** Look arround with mouse <br>
+**right shift** Move camera upwards <br>
+**right control** Move camera downwards <br>
+**arrow left** Move camera to the left <br>
+**arrow right** Move camera to the right <br>
+**arrow up** Move camera fowards <br>
+**arrow down** Move camera backwards <br>
+**scrool** Zoom in/out <br>
 
 # Todo!
 - [x] Create folders skeleton
@@ -21,9 +35,9 @@ node src/server/server.js
     - [X] Create button to animate
 - [x] Create the projection matrix
 - [X] Read a WebGL Texture (How?)
-- [ ] Create the world
-    - [ ] Define what scene will look like
-    - [ ] Define what is the camera path
-    - [ ] Define position and size of objects
-- [ ] Animate objects in the world
-- [ ] Add running instructions
+- [X] Create the world
+    - [X] Define what scene will look like
+    - [X] Define what is the camera path
+    - [X] Define position and size of objects
+- [X] Animate objects in the world
+- [X] Add running instructions
