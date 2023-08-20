@@ -41,7 +41,7 @@ export class SplinePoints implements DrawableObject {
   }
 
   draw(gl: WebGL2RenderingContext, view : glm.mat4, projection : glm.mat4) : void {
-    gl.disable(gl.DEPTH_TEST);
+    // gl.disable(gl.DEPTH_TEST);
     gl.useProgram(SplinePoints.program as WebGLProgram);
 
     gl.bindVertexArray(this.vao);
@@ -67,9 +67,10 @@ export class SplinePoints implements DrawableObject {
     gl.uniform4f(SplinePoints.u_color, 0.25, 0.25, 0.3, 1.0);
     
     gl.drawArrays(WebGL2RenderingContext.LINES, 0, this.spline.getNumCurvesInSpline * 4);
+    gl.disable(gl.DEPTH_TEST);
     gl.drawArrays(WebGL2RenderingContext.POINTS, 0, this.spline.getNumCurvesInSpline * 4);
-    gl.bindVertexArray(null);
     gl.enable(gl.DEPTH_TEST);
+    gl.bindVertexArray(null);
   } 
   
   updateSplinePoints(gl : WebGL2RenderingContext) {

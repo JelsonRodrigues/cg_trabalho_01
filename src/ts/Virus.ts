@@ -203,33 +203,6 @@ export class Virus implements DrawableObject, AnimatedObject {
 
         Virus.vertices = obj_result.index_vertices.length;
       }
-      
-      // ([vertexArray, vertexTextCoordArray, vertexNormalArray, 
-      //   vertexIndexArray, vertexIndexTextCoordArray, vertexIndexNormalArray]) => {
-      //     const packed_data = new Float32Array(vertexIndexArray.length * 8);
-
-      //     for (let i = 0; i < vertexIndexArray.length; ++i) {
-      //       packed_data[i*8 + 0] = vertexArray[vertexIndexArray[i] * 3 + 0]; 
-      //       packed_data[i*8 + 1] = vertexArray[vertexIndexArray[i] * 3 + 1];  
-      //       packed_data[i*8 + 2] = vertexArray[vertexIndexArray[i] * 3 + 2]; 
-
-      //       packed_data[i*8 + 3] = vertexNormalArray[vertexIndexNormalArray[i] * 3 + 0];
-      //       packed_data[i*8 + 4] = vertexNormalArray[vertexIndexNormalArray[i] * 3 + 1];
-      //       packed_data[i*8 + 5] = vertexNormalArray[vertexIndexNormalArray[i] * 3 + 2];
-
-      //       packed_data[i*8 + 6] = vertexTextCoordArray[vertexIndexTextCoordArray[i] * 2 + 0];
-      //       packed_data[i*8 + 7] = vertexTextCoordArray[vertexIndexTextCoordArray[i] * 2 + 1];
-      //     }
-
-      //     gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, Virus.buffer_vertices);
-      //     gl.bufferData(
-      //       WebGL2RenderingContext.ARRAY_BUFFER,
-      //       packed_data,
-      //       WebGL2RenderingContext.STATIC_DRAW
-      //     );
-
-      //     Virus.vertices = vertexIndexArray.length;
-      //   }
     );
 
     // Read the texture

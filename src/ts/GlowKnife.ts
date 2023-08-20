@@ -4,9 +4,13 @@ import { WebGLUtils } from "./WebGLUtils";
 
 import vertexSource from "../shaders/knifeVertexShader.glsl";
 import fragmentSource from "../shaders/knifeFragmentShader.glsl";
+import { AnimatedObject } from "./AnimatedObject";
 
-export class GlowKnife implements DrawableObject {
+export class GlowKnife implements DrawableObject, AnimatedObject {
   public model : glm.mat4;
+  public time_total : number = 2_000 * Math.random() + 1_000;
+  private paused_animation : boolean = false;
+  private accumulated_time : number = 0;
 
   private static initialized : boolean = false;
   private static program : WebGLProgram;
@@ -31,6 +35,34 @@ export class GlowKnife implements DrawableObject {
       this.setup(gl);
     }
     GlowKnife.initialized = true;
+  }
+
+  updateAnimation(fElapsedTime:number): void {
+    if (!this.paused_animation) {
+      this.accumulated_time += fElapsedTime;
+      const percent_animation = this.accumulated_time / this.time_total;
+      const translation = glm.vec3.fromValues(this.model[12], this.model[13], this.model[14]);
+      glm.mat4.rotate(this.model, glm.mat4.create(), 2 * Math.PI * percent_animation, [0,  1, 0]);
+      this.model[12] = translation[0];
+      this.model[13] = translation[1];
+      this.model[14] = translation[2];
+    }
+  }
+
+  resetAnimation(): void {
+    this.accumulated_time = 0;
+  }
+
+  toggleAnimation(): void {
+    this.paused_animation = !this.paused_animation;
+  }
+
+  pauseAnimation(): void {
+    this.paused_animation = true;
+  }
+
+  resumeAnimation(): void {
+    this.paused_animation = false;
   }
 
   draw(gl: WebGL2RenderingContext, view : glm.mat4, projection : glm.mat4) : void {
