@@ -1,6 +1,7 @@
 # Trabalho 01 de Computacao Grafica
 
 # Run 
+You can run locally following the instructions bellow or access the link [CG Trabalho 01](https://jelsonrodrigues.github.io/cg_trabalho_01/)<br>
 ```
 git clone https://github.com/JelsonRodrigues/cg_trabalho_01
 cd cg_trabalho_01
