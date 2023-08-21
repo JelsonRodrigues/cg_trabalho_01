@@ -97,26 +97,26 @@ export class Pyramid implements DrawableObject {
     // Unbind VAO buffer so other objects cannot modify it
     gl.bindVertexArray(null);
 
-    const data = WebGLUtils.readObj("./objects/pyramid.obj").then(
-      ([vertexArray, vertexTextCoordArray, vertexNormalArray, 
-        vertexIndexArray, vertexIndexTextCoordArray, vertexIndexNormalArray]) => {
-          gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, Pyramid.buffer_vertices);
-          gl.bufferData(
-            WebGL2RenderingContext.ARRAY_BUFFER,
-            new Float32Array(vertexArray),
-            WebGL2RenderingContext.STATIC_DRAW
-          );
+    // const data = WebGLUtils.readObj("./objects/pyramid.obj").then(
+    //   ([vertexArray, vertexTextCoordArray, vertexNormalArray, 
+    //     vertexIndexArray, vertexIndexTextCoordArray, vertexIndexNormalArray]) => {
+    //       gl.bindBuffer(WebGL2RenderingContext.ARRAY_BUFFER, Pyramid.buffer_vertices);
+    //       gl.bufferData(
+    //         WebGL2RenderingContext.ARRAY_BUFFER,
+    //         new Float32Array(vertexArray),
+    //         WebGL2RenderingContext.STATIC_DRAW
+    //       );
 
-          gl.bindBuffer(WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER, Pyramid.buffer_index_vertices);
-          gl.bufferData(
-            WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER,
-            new Uint16Array(vertexIndexArray),
-            WebGL2RenderingContext.STATIC_DRAW,
-          );
+    //       gl.bindBuffer(WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER, Pyramid.buffer_index_vertices);
+    //       gl.bufferData(
+    //         WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER,
+    //         new Uint16Array(vertexIndexArray),
+    //         WebGL2RenderingContext.STATIC_DRAW,
+    //       );
 
-          Pyramid.vertices = vertexArray.length / 3;
-          Pyramid.faces = vertexIndexArray.length;
-        }
-    );
+    //       Pyramid.vertices = vertexArray.length / 3;
+    //       Pyramid.faces = vertexIndexArray.length;
+    //     }
+    // );
   }
 }
