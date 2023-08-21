@@ -1,4 +1,3 @@
 src/*.js
 src/**/*.js
-!src/dist/*.js
 node_modules
